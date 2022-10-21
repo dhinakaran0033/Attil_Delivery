@@ -179,7 +179,7 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
         drawPolyline()
 
-        /*val apiServices = RetrofitClient.apiServices(this)
+        val apiServices = RetrofitClient.apiServices(this)
         apiServices.getDirection(fromFKIP, toMonas,"driving", getString(R.string.map_key))
             .enqueue(object : Callback<DirectionResponses> {
                 override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
@@ -192,7 +192,7 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
                     Log.e("Test","Error")
                     Log.e("anjir error", t.localizedMessage)
                 }
-            })*/
+            })
 
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
