@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Attil Delivery</string>
+    <string name="enter_your_mobile_number">Enter Your Mobile Number</string>
+    <string name="no_internet">Please Check Your Internet Connection</string>
+    <string name="required">Required</string>
+    <string name="retry">Retry</string>
+    <string name="new_user">New User?</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="login">Login</string>
+    <string name="login_id">Login ID</string>
+    <string name="password">Password</string>
+    <string name="delivery_title">ATTIL DELIVERY LOGIN</string>
+    <string name="notifications">Notifications</string>
+    <string name="pick_up">Pick Up</string>
+    <string name="drop_off">Drop Off</string>
+    <string name="activated_location">Activated Current Location</string>
+    <string name="accept_order">Accept Order</string>
+    <string name="decline">Decline</string>
+    <string name="test1">Loading..</string>
+    <string name="waiting_packed">Waiting to be packed</string>
+    <string name="view_order">View Order</string>
+    <string name="cancel">Cancel</string>
+    <string name="delivery_box">Delivery Box</string>
+    <string name="base_url">https://maps.googleapis.com</string>
+    <string name="map_key">AIzaSyAB2FD9jvJ04hBCgtp6rRvRKgGCODE75sY</string>
+</resources>

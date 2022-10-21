@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/bg_shadow.xml" value="0.2455" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/boundary_button.xml" value="0.167" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/boundary_gray.xml" value="0.167" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/boundary_primary.xml" value="0.167" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/circle_normal_primary.xml" value="0.167" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/circle_normal_tick.xml" value="0.1365" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/close_x.xml" value="0.1365" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/custom_radio_drawable.xml" value="0.167" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2265" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/ic_visibility_black_24dp.xml" value="0.1185" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/drawable/password_show_drawable.xml" value="0.1185" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/activity_home.xml" value="0.1421875" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/activity_login.xml" value="0.264" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/activity_main.xml" value="0.19322916666666667" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/activity_splash.xml" value="0.22826086956521738" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/activity_sub_module.xml" value="0.19322916666666667" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/activity_view_order.xml" value="0.22135416666666666" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/completed_delivery_list_adapter.xml" value="0.20729166666666668" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/custom_error_snackbar.xml" value="0.1890625" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/delivery_pending_list_adapter.xml" value="0.22146739130434784" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/fragment_competed_delivery.xml" value="0.20729166666666668" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/fragment_delivery_pending.xml" value="0.16302083333333334" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/fragment_delivery_tab.xml" value="0.1" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/fragment_map.xml" value="0.16822916666666668" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/fragment_maps.xml" value="0.21458333333333332" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/fragment_notification.xml" value="0.1671875" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/fragment_profile.xml" value="0.291970802919708" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/notification_list_adapter.xml" value="0.264" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/progress_bar_layout.xml" value="0.19322916666666667" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/layout/view_order.xml" value="0.22135416666666666" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2265" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/mipmap-xhdpi/ic_launcher.xml" value="0.2265" />
+        <entry key="..\:/Android_Apps/attil_Android-delivery/app/src/main/res/mipmap-xhdpi/ic_launcher_round.xml" value="0.167" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
