@@ -93,10 +93,6 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as SupportMapFragment
 
-
-
-
-       // handleUiElement()
     }
 
     private fun initClassReference() {
@@ -158,8 +154,6 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
         mMap.addMarker(markerMonas)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(toLatlog, 11.6f))
 
-        val fromFKIP = fromLatlog.latitude.toString() + "," + fromLatlog.longitude.toString()
-        val toMonas = toLatlog.latitude.toString() + "," + toLatlog.longitude.toString()
         shape = directionList.routes?.get(0)?.overviewPolyline?.points.toString()
 
         val steps = directionList.routes?.get(0)?.legs?.get(0)?.steps
@@ -179,22 +173,6 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
         drawPolyline()
 
-        val apiServices = RetrofitClient.apiServices(this)
-        apiServices.getDirection(fromFKIP, toMonas,"driving", getString(R.string.map_key))
-            .enqueue(object : Callback<DirectionResponses> {
-                override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
-                    //drawPolyline(response)
-                    Log.e("Test","succuess")
-                    Log.e("bisa dong oke", response.message())
-                }
-
-                override fun onFailure(call: Call<DirectionResponses>, t: Throwable) {
-                    Log.e("Test","Error")
-                    Log.e("anjir error", t.localizedMessage)
-                }
-            })
-
-
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (context?.let {
                     ContextCompat.checkSelfPermission(
@@ -208,6 +186,27 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
             buildGoogleApiClient()
             mMap!!.isMyLocationEnabled = true
         }
+
+    }
+// not come api so we need to draw and send response to server
+    fun drawMap(fromLatlog: String, toLatlog: String, mapFragment: MapFragment) {
+
+        val apiServices = RetrofitClient.apiServices(this)
+        apiServices.getDirection(fromLatlog, toLatlog,"driving", getString(R.string.map_key))
+            .enqueue(object : Callback<DirectionResponses> {
+                override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
+                    Log.e("Test_res",response.toString())
+
+                    directionList = response.body()!!;
+                    this@MapFragment.mapFragment.getMapAsync(mapFragment)
+                }
+
+                override fun onFailure(call: Call<DirectionResponses>, t: Throwable) {
+                    Log.e("Test","Error")
+                    Log.e("anjir error", t.localizedMessage)
+                }
+            })
+
 
     }
 
@@ -240,7 +239,7 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
 
     override fun onLocationChanged(location: Location) {
-
+Log.e("Test","dhinaaaaaaaaaaaaaaaaaaaaa")
         mLastLocation = location
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker!!.remove()
@@ -453,7 +452,14 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
                                 toLatlog = LatLng(deliveryPendingDto.deliveryLat, deliveryPendingDto.deliveryLng)
 
                                 mapFragment.getMapAsync(this)
-                                //drawPolyline(directionList)
+
+                            }else{
+                                fromLatlog = LatLng(deliveryPendingDto.shopLat, deliveryPendingDto.shopLng)
+                                toLatlog = LatLng(deliveryPendingDto.deliveryLat, deliveryPendingDto.deliveryLng)
+                                val fromFKIP = deliveryPendingDto.shopLat.toString() +  "," + deliveryPendingDto.shopLng.toString()
+                                val toMonas = deliveryPendingDto.deliveryLat.toString() + "," + deliveryPendingDto.deliveryLng.toString()
+
+                                drawMap(fromFKIP,toMonas,this)
                             }
 
 
@@ -464,17 +470,7 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
                     }
 
                 }
-
-
-                for(item in deliveryPendingList){
-                    Log.e("Test",item.notificationStatus)
-                    Log.e("Test",item.orderId)
-                    Log.e("TestdeliveryLat", item.deliveryLat.toString())
-                    Log.e("TestdeliveryLng", item.deliveryLng.toString())
-                }
-
-                // set Adapter
-                //populateNormalOfferList()
+                
             } else {
                 /*binding.lvNotification.visibility = View.GONE
                 binding.tvNormalOfferNoData.visibility = View.VISIBLE*/
