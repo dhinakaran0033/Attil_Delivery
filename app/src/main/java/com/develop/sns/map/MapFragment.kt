@@ -470,7 +470,7 @@ Log.e("Test","dhinaaaaaaaaaaaaaaaaaaaaa")
                     }
 
                 }
-                
+
             } else {
                 /*binding.lvNotification.visibility = View.GONE
                 binding.tvNormalOfferNoData.visibility = View.VISIBLE*/
