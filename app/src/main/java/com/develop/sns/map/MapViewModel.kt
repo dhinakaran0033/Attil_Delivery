@@ -17,8 +17,8 @@ class MapViewModel: ViewModel() {
         return apiRepository.callApi(call)
     }
 
-    fun setOrderStatus(requestObject: JsonObject, token: String): LiveData<JSONObject> {
-        val call = api.setNotificationStatus("Bearer $token", requestObject)
+    fun sendMapData(requestObject: JsonObject, token: String): LiveData<JSONObject> {
+        val call = api.sendMapData("Bearer $token", requestObject)
         return apiRepository.callApi(call)
     }
 

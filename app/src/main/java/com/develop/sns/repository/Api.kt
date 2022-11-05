@@ -47,6 +47,12 @@ interface Api {
         @Body requestObject: JsonObject,
     ): Call<ResponseBody>
 
+    @POST("order/create/orderMapdata")
+    fun sendMapData(
+        @Header("Authorization") authorization: String,
+        @Body requestObject: JsonObject,
+    ): Call<ResponseBody>
+
     @POST("customer/cartCount")
     fun cartCount(
         @Header("Authorization") authorization: String,
