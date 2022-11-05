@@ -114,15 +114,14 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
                 val requestObject = JsonObject()
                 requestObject.addProperty("carrierId", carrierId)
                 requestObject.addProperty("skip", 0)
-                Log.e("Normal request", requestObject.toString())
                 val mapViewModel = MapViewModel()
                 mapViewModel.getAcceptedAll(
                     requestObject,
                     accessToken
                 ).observe(viewLifecycleOwner, Observer<JSONObject?> { jsonObject ->
                    parseNormalOffersResponse(jsonObject)
+                    Log.e("Test_result",jsonObject.toString())
                     binding.lnProgressbar.progressBar.visibility = View.GONE
-                    Log.e("test11", jsonObject.toString())
                 })
             } else {
                 binding.lnProgressbar.progressBar.visibility = View.GONE
@@ -141,7 +140,6 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
 
     override fun onMapReady(googleMap: GoogleMap) {
-        Log.e("Test","OnMapReady")
         mMap = googleMap
         val markerFkip = MarkerOptions()
             .position(fromLatlog)
@@ -189,20 +187,27 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
     }
 // not come api so we need to draw and send response to server
-    fun drawMap(fromLatlog: String, toLatlog: String, mapFragment: MapFragment) {
-
+    fun drawMap(
+    fromLatlog: String,
+    toLatlog: String,
+    mapFragment: MapFragment,
+    orderObjectId: String) {
         val apiServices = RetrofitClient.apiServices(this)
         apiServices.getDirection(fromLatlog, toLatlog,"driving", getString(R.string.map_key))
             .enqueue(object : Callback<DirectionResponses> {
                 override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
                     Log.e("Test_res",response.toString())
-
-                    directionList = response.body()!!;
+                    directionList = response.body()!!
                     this@MapFragment.mapFragment.getMapAsync(mapFragment)
+
+                    var gson = Gson()
+                    var jsonString = gson.toJson(directionList)
+                    Log.e("Test_33",jsonString)
+                    accept_Order(orderObjectId,jsonString);
+
                 }
 
                 override fun onFailure(call: Call<DirectionResponses>, t: Throwable) {
-                    Log.e("Test","Error")
                     Log.e("anjir error", t.localizedMessage)
                 }
             })
@@ -239,7 +244,6 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
 
     override fun onLocationChanged(location: Location) {
-Log.e("Test","dhinaaaaaaaaaaaaaaaaaaaaa")
         mLastLocation = location
         if (mCurrLocationMarker != null) {
             mCurrLocationMarker!!.remove()
@@ -459,7 +463,7 @@ Log.e("Test","dhinaaaaaaaaaaaaaaaaaaaaa")
                                 val fromFKIP = deliveryPendingDto.shopLat.toString() +  "," + deliveryPendingDto.shopLng.toString()
                                 val toMonas = deliveryPendingDto.deliveryLat.toString() + "," + deliveryPendingDto.deliveryLng.toString()
 
-                                drawMap(fromFKIP,toMonas,this)
+                                drawMap(fromFKIP,toMonas,this,deliveryPendingDto.orderObjectId)
                             }
 
 
@@ -480,5 +484,37 @@ Log.e("Test","dhinaaaaaaaaaaaaaaaaaaaaa")
             e.printStackTrace()
         }
     }
+
+    private fun accept_Order(orderObjectId: String, jsonString: String) {
+        try {
+            binding.lnProgressbar.progressBar.visibility= View.VISIBLE
+            if (AppUtils.isConnectedToInternet(requireActivity())) {
+                val requestObject = JsonObject()
+                requestObject.addProperty("orderObjectId", orderObjectId)
+                requestObject.addProperty("mapData", jsonString)
+                val mapViewModel = MapViewModel()
+                mapViewModel.sendMapData(requestObject,accessToken)
+                    .observe(this, { jsonObject ->
+                        //Log.e("jsonObject", jsonObject.toString() + "")
+                        if (jsonObject != null) {
+                            binding.lnProgressbar.progressBar.visibility= View.GONE
+                            Log.e("Test","Test_innn")
+                            Log.e("Test",jsonObject.toString())
+                        }
+                    })
+            } else {
+                CommonClass.showToastMessage(
+                    requireActivity(),
+                    binding.layCon,
+                    resources.getString(R.string.no_internet),
+                    Toast.LENGTH_SHORT
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
 
 }
