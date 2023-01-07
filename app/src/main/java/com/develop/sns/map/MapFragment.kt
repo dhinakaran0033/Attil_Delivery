@@ -45,30 +45,17 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
-class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
-    GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener  {
+class MapFragment: Fragment(), OnMapReadyCallback {
 
     private val binding by lazy { FragmentMapBinding.inflate(layoutInflater) }
     private var preferenceHelper: PreferenceHelper? = null
     lateinit var accessToken: String
     lateinit var carrierId: String
-    private lateinit var notificationList: ArrayList<NotificationDto>
-
-    //private var mMap: GoogleMap? = null
-    internal lateinit var mLastLocation: Location
-    internal lateinit var mLocationResult: LocationRequest
-    internal lateinit var mLocationCallback: LocationCallback
-    internal var mCurrLocationMarker: Marker? = null
-    internal var mGoogleApiClient: GoogleApiClient? = null
-    internal lateinit var mLocationRequest: LocationRequest
-    internal var mFusedLocationClient: FusedLocationProviderClient? = null
     private lateinit var deliveryPendingList: ArrayList<DeliveryPendingDto>
-
     private lateinit var mMap: GoogleMap
     private lateinit var fromLatlog: LatLng
     private lateinit var toLatlog: LatLng
     private lateinit var shape: String
-    private lateinit var mapFragment: SupportMapFragment
     private lateinit var directionList: DirectionResponses
 
 
@@ -82,6 +69,7 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+
         return binding.root
 
     }
@@ -90,8 +78,8 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initClassReference()
-
-        mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as SupportMapFragment
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
 
     }
 
@@ -101,7 +89,6 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
             accessToken = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_TOKEN)!!
             carrierId = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_CARRIER_ID)!!
             deliveryPendingList = ArrayList()
-            getAcceptedAll()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -141,6 +128,34 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        getAcceptedAll()
+    }
+// not come api so we need to draw and send response to server
+    fun drawMap(fromLatlog: String,toLatlog: String,mapFragment: MapFragment,orderObjectId: String) {
+        val apiServices = RetrofitClient.apiServices(this)
+        apiServices.getDirection(fromLatlog, toLatlog,"driving", getString(R.string.map_key))
+            .enqueue(object : Callback<DirectionResponses> {
+                override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
+                    Log.e("Test_res",response.toString())
+                    directionList = response.body()!!
+                    drawPolyline()
+
+                    var gson = Gson()
+                    var jsonString = gson.toJson(directionList)
+                    Log.e("Test_33",jsonString)
+                    accept_Order(orderObjectId,jsonString);
+
+                }
+
+                override fun onFailure(call: Call<DirectionResponses>, t: Throwable) {
+                    Log.e("anjir error", t.localizedMessage)
+                }
+            })
+
+
+    }
+
+    private fun drawPolyline() {
         val markerFkip = MarkerOptions()
             .position(fromLatlog)
             .title("Shop")
@@ -169,122 +184,6 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
             }
         }
 
-        drawPolyline()
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (context?.let {
-                    ContextCompat.checkSelfPermission(
-                        it,
-                        Manifest.permission.ACCESS_FINE_LOCATION)
-                } == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient()
-                mMap!!.isMyLocationEnabled = true
-            }
-        } else {
-            buildGoogleApiClient()
-            mMap!!.isMyLocationEnabled = true
-        }
-
-    }
-// not come api so we need to draw and send response to server
-    fun drawMap(
-    fromLatlog: String,
-    toLatlog: String,
-    mapFragment: MapFragment,
-    orderObjectId: String) {
-        val apiServices = RetrofitClient.apiServices(this)
-        apiServices.getDirection(fromLatlog, toLatlog,"driving", getString(R.string.map_key))
-            .enqueue(object : Callback<DirectionResponses> {
-                override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
-                    Log.e("Test_res",response.toString())
-                    directionList = response.body()!!
-                    this@MapFragment.mapFragment.getMapAsync(mapFragment)
-
-                    var gson = Gson()
-                    var jsonString = gson.toJson(directionList)
-                    Log.e("Test_33",jsonString)
-                    accept_Order(orderObjectId,jsonString);
-
-                }
-
-                override fun onFailure(call: Call<DirectionResponses>, t: Throwable) {
-                    Log.e("anjir error", t.localizedMessage)
-                }
-            })
-
-
-    }
-
-    @Synchronized
-    protected fun buildGoogleApiClient() {
-        mGoogleApiClient = context?.let {
-            GoogleApiClient.Builder(it)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build()
-        }
-        mGoogleApiClient!!.connect()
-    }
-
-    override fun onConnected(bundle: Bundle?) {
-
-        mLocationRequest = LocationRequest()
-        mLocationRequest.interval = 1000
-        mLocationRequest.fastestInterval = 1000
-        mLocationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-        if (context?.let {
-                ContextCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-            } == PackageManager.PERMISSION_GRANTED) {
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-            mFusedLocationClient?.requestLocationUpdates(mLocationRequest,mLocationCallback, Looper.myLooper())
-        }
-    }
-
-
-    override fun onLocationChanged(location: Location) {
-        mLastLocation = location
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker!!.remove()
-        }
-        //Place current location marker
-        val latLng = LatLng(location.latitude, location.longitude)
-        val markerOptions = MarkerOptions()
-        markerOptions.position(latLng)
-        markerOptions.title("Current Position")
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-        mCurrLocationMarker = mMap!!.addMarker(markerOptions)
-
-        //move map camera
-        mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-        mMap!!.animateCamera(CameraUpdateFactory.zoomTo(11f))
-
-        //stop location updates
-        if (mGoogleApiClient != null) {
-            mFusedLocationClient?.removeLocationUpdates(mLocationCallback)
-        }
-    }
-
-    override fun onConnectionFailed(connectionResult: ConnectionResult) {
-        Toast.makeText(context,"connection failed", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onConnectionSuspended(p0: Int) {
-        Toast.makeText(context,"connection suspended", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun drawPolyline(response: Response<DirectionResponses>) {
-        val shape = response.body()?.routes?.get(0)?.overviewPolyline?.points
-        val polyline = PolylineOptions()
-            .addAll(PolyUtil.decode(shape))
-            .width(8f)
-            .color(Color.RED)
-        mMap.addPolyline(polyline)
-    }
-
-    private fun drawPolyline() {
-        Log.e("Test", shape.toString())
         val polyline = PolylineOptions()
             .addAll(PolyUtil.decode(shape))
             .width(8f)
@@ -455,7 +354,7 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
                                 fromLatlog = LatLng(deliveryPendingDto.shopLat, deliveryPendingDto.shopLng)
                                 toLatlog = LatLng(deliveryPendingDto.deliveryLat, deliveryPendingDto.deliveryLng)
 
-                                mapFragment.getMapAsync(this)
+                                drawPolyline()
 
                             }else{
                                 fromLatlog = LatLng(deliveryPendingDto.shopLat, deliveryPendingDto.shopLng)

@@ -28,10 +28,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "BASE_API_URL", "\"http://yaazhproducts.herokuapp.com/\""
+            buildConfigField "String", "BASE_API_URL", "\"http://156.67.217.185:3000/\""
         }
         debug {
-            buildConfigField "String", "BASE_API_URL", "\"http://yaazhproducts.herokuapp.com/\""
+            buildConfigField "String", "BASE_API_URL", "\"http://156.67.217.185:3000/\""
         }
     }
     compileOptions {
