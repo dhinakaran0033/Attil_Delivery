@@ -56,7 +56,6 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     private lateinit var fromLatlog: LatLng
     private lateinit var toLatlog: LatLng
     private lateinit var shape: String
-    private lateinit var mapFragment: SupportMapFragment
     private lateinit var directionList: DirectionResponses
 
 
@@ -70,6 +69,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+
         return binding.root
 
     }
@@ -78,8 +78,8 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initClassReference()
-
-        mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as SupportMapFragment
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
 
     }
 
@@ -89,7 +89,6 @@ class MapFragment: Fragment(), OnMapReadyCallback {
             accessToken = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_TOKEN)!!
             carrierId = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_CARRIER_ID)!!
             deliveryPendingList = ArrayList()
-            getAcceptedAll()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -129,6 +128,34 @@ class MapFragment: Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        getAcceptedAll()
+    }
+// not come api so we need to draw and send response to server
+    fun drawMap(fromLatlog: String,toLatlog: String,mapFragment: MapFragment,orderObjectId: String) {
+        val apiServices = RetrofitClient.apiServices(this)
+        apiServices.getDirection(fromLatlog, toLatlog,"driving", getString(R.string.map_key))
+            .enqueue(object : Callback<DirectionResponses> {
+                override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
+                    Log.e("Test_res",response.toString())
+                    directionList = response.body()!!
+                    drawPolyline()
+
+                    var gson = Gson()
+                    var jsonString = gson.toJson(directionList)
+                    Log.e("Test_33",jsonString)
+                    accept_Order(orderObjectId,jsonString);
+
+                }
+
+                override fun onFailure(call: Call<DirectionResponses>, t: Throwable) {
+                    Log.e("anjir error", t.localizedMessage)
+                }
+            })
+
+
+    }
+
+    private fun drawPolyline() {
         val markerFkip = MarkerOptions()
             .position(fromLatlog)
             .title("Shop")
@@ -157,36 +184,6 @@ class MapFragment: Fragment(), OnMapReadyCallback {
             }
         }
 
-        drawPolyline()
-
-    }
-// not come api so we need to draw and send response to server
-    fun drawMap(fromLatlog: String,toLatlog: String,mapFragment: MapFragment,orderObjectId: String) {
-        val apiServices = RetrofitClient.apiServices(this)
-        apiServices.getDirection(fromLatlog, toLatlog,"driving", getString(R.string.map_key))
-            .enqueue(object : Callback<DirectionResponses> {
-                override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
-                    Log.e("Test_res",response.toString())
-                    directionList = response.body()!!
-                    this@MapFragment.mapFragment.getMapAsync(mapFragment)
-
-                    var gson = Gson()
-                    var jsonString = gson.toJson(directionList)
-                    Log.e("Test_33",jsonString)
-                    accept_Order(orderObjectId,jsonString);
-
-                }
-
-                override fun onFailure(call: Call<DirectionResponses>, t: Throwable) {
-                    Log.e("anjir error", t.localizedMessage)
-                }
-            })
-
-
-    }
-
-    private fun drawPolyline() {
-        Log.e("Test", shape.toString())
         val polyline = PolylineOptions()
             .addAll(PolyUtil.decode(shape))
             .width(8f)
@@ -357,7 +354,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
                                 fromLatlog = LatLng(deliveryPendingDto.shopLat, deliveryPendingDto.shopLng)
                                 toLatlog = LatLng(deliveryPendingDto.deliveryLat, deliveryPendingDto.deliveryLng)
 
-                                mapFragment.getMapAsync(this)
+                                drawPolyline()
 
                             }else{
                                 fromLatlog = LatLng(deliveryPendingDto.shopLat, deliveryPendingDto.shopLng)
