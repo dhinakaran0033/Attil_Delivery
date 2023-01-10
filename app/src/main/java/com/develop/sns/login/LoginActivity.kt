@@ -1,8 +1,10 @@
 package com.develop.sns.login
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Build
 import android.os.Build.VERSION_CODES
@@ -18,8 +20,11 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.develop.sns.BuildConfig
+import com.develop.sns.Location.LocationService
 import com.develop.sns.MainActivityViewModel
 import com.develop.sns.R
 import com.develop.sns.SubModuleActivity
@@ -54,6 +59,10 @@ class LoginActivity : SubModuleActivity() {
         setContentView(binding.root)
         initClassReference()
         gcmId = getFireBaseToken()
+
+        if (!checkPermission()) {
+            requestPermission()
+        }
 
         binding.btnSignIn.setOnClickListener {
             logInService()
@@ -239,6 +248,9 @@ class LoginActivity : SubModuleActivity() {
 
     private fun launchHomeActivity() {
         try {
+            // start location service
+            ContextCompat.startForegroundService(this, Intent(this, LocationService::class.java))
+
             val intent = Intent(this@LoginActivity, HomeActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
@@ -246,6 +258,16 @@ class LoginActivity : SubModuleActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun checkPermission(): Boolean {
+        val result = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION)
+        val result1 = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
     }
 
 }

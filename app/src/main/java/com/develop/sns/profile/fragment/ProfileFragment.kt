@@ -1,19 +1,14 @@
 package com.develop.sns.home.profile.fragment
 
-import android.app.Activity
-import android.content.DialogInterface
+
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.develop.sns.MainActivity
-import com.develop.sns.R
+import com.develop.sns.Location.LocationService
 import com.develop.sns.databinding.FragmentProfileBinding
-import com.develop.sns.utils.AppConstant
 import com.develop.sns.utils.PreferenceHelper
 
 
@@ -39,6 +34,10 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.lnLogout.setOnClickListener{
+            activity?.stopService(Intent(activity, LocationService::class.java))
+        }
         /*initClassReference()
         handleUiElement()*/
     }

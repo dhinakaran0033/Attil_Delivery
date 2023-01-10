@@ -69,7 +69,8 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-
+        val mapFragment = childFragmentManager.findFragmentById(binding.mapView.id) as SupportMapFragment
+        mapFragment.getMapAsync(this)
         return binding.root
 
     }
@@ -78,9 +79,6 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initClassReference()
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
-
     }
 
     private fun initClassReference() {

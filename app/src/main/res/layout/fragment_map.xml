@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     class = "com.develop.sns.map.MapFragment">
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map_view"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent">
+    </androidx.fragment.app.FragmentContainerView>
 
     <include
         android:id="@+id/ln_progressbar"
