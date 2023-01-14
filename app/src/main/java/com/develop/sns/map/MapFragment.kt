@@ -47,7 +47,8 @@ import retrofit2.http.Query
 
 class MapFragment: Fragment(), OnMapReadyCallback {
 
-    private val binding by lazy { FragmentMapsBinding.inflate(layoutInflater) }
+    private var _binding: FragmentMapsBinding? = null
+    private val binding get() = _binding!!
     private var preferenceHelper: PreferenceHelper? = null
     lateinit var accessToken: String
     lateinit var carrierId: String
@@ -69,14 +70,15 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        _binding = FragmentMapsBinding.inflate(inflater, container, false)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as SupportMapFragment
+        mapFragment.getMapAsync(this)
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(binding.mapView.id) as SupportMapFragment
-        mapFragment.getMapAsync(this)
         initClassReference()
     }
 
