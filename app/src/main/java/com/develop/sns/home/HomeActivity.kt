@@ -204,7 +204,7 @@ class HomeActivity : SubModuleActivity() {
             val fragmentManager: FragmentManager = supportFragmentManager
             val transaction: FragmentTransaction = fragmentManager.beginTransaction()
             transaction.replace(R.id.fl_fragment, mapFragment)
-            transaction.commitAllowingStateLoss()
+            transaction.commit()
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
