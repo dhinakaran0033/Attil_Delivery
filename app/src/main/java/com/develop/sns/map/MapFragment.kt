@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.develop.sns.R
-import com.develop.sns.databinding.FragmentMapBinding
+import com.develop.sns.databinding.FragmentMapsBinding
 import com.develop.sns.deliverypending.dto.DeliveryPendingDto
 import com.develop.sns.map.model.DirectionResponses
 import com.develop.sns.notification.dto.NotificationDto
@@ -47,7 +47,8 @@ import retrofit2.http.Query
 
 class MapFragment: Fragment(), OnMapReadyCallback {
 
-    private val binding by lazy { FragmentMapBinding.inflate(layoutInflater) }
+    private var _binding: FragmentMapsBinding? = null
+    private val binding get() = _binding!!
     private var preferenceHelper: PreferenceHelper? = null
     lateinit var accessToken: String
     lateinit var carrierId: String
@@ -69,10 +70,10 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        val mapFragment = childFragmentManager.findFragmentById(binding.mapView.id) as SupportMapFragment
+        _binding = FragmentMapsBinding.inflate(inflater, container, false)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as SupportMapFragment
         mapFragment.getMapAsync(this)
         return binding.root
-
     }
 
 
