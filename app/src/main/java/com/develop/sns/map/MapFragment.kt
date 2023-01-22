@@ -166,28 +166,30 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         mMap.addMarker(markerMonas)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(toLatlog, 11.6f))
 
-        shape = directionList.routes?.get(0)?.overviewPolyline?.points.toString()
+        if(!directionList.routes.isNullOrEmpty()){
+            shape = directionList.routes?.get(0)?.overviewPolyline?.points.toString()
 
-        val steps = directionList.routes?.get(0)?.legs?.get(0)?.steps
-        if (steps != null) {
-            for (x in steps) {
+            val steps = directionList.routes?.get(0)?.legs?.get(0)?.steps
+            if (steps != null) {
+                for (x in steps) {
 
-                val lat: Double = x?.startLocation?.lat!!
-                val lon: Double = x?.startLocation?.lng!!
-                val markPoints = LatLng(lat,lon)
+                    val lat: Double = x?.startLocation?.lat!!
+                    val lon: Double = x?.startLocation?.lng!!
+                    val markPoints = LatLng(lat,lon)
 
-                val markerFkip = MarkerOptions()
-                    .position(markPoints)
-                    .title(x?.htmlInstructions)
-                mMap.addMarker(markerFkip)
+                    val markerFkip = MarkerOptions()
+                        .position(markPoints)
+                        .title(x?.htmlInstructions)
+                    mMap.addMarker(markerFkip)
+                }
             }
-        }
 
-        val polyline = PolylineOptions()
-            .addAll(PolyUtil.decode(shape))
-            .width(8f)
-            .color(Color.RED)
-        mMap.addPolyline(polyline)
+            val polyline = PolylineOptions()
+                .addAll(PolyUtil.decode(shape))
+                .width(8f)
+                .color(Color.RED)
+            mMap.addPolyline(polyline)
+        }
     }
 
 
