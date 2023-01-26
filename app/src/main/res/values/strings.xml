@@ -21,6 +21,7 @@
     <string name="view_order">View Order</string>
     <string name="cancel">Cancel</string>
     <string name="delivery_box">Delivery Box</string>
+    <string name="delivery_pending">Delivery Pending</string>
+    <string name="completed_delivery">Complete Delivery</string>
     <string name="base_url">https://maps.googleapis.com</string>
-    <string name="map_key"></string>
 </resources>
