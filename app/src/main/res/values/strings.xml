@@ -22,5 +22,6 @@
     <string name="cancel">Cancel</string>
     <string name="delivery_box">Delivery Box</string>
     <string name="base_url">https://maps.googleapis.com</string>
-    <string name="map_key"></string>
+    <string name="map_key">AIzaSyAW_R94-aOHshzgJBXyywqaHD2sRfWbpyI</string>
+    <!--<string name="map_key">AIzaSyAB2FD9jvJ04hBCgtp6rRvRKgGCODE75sY</string>-->
 </resources>

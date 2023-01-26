@@ -86,9 +86,9 @@ class NotificationFragment: Fragment() , NotificationListener {
                     requestObject,
                     accessToken
                 ).observe(viewLifecycleOwner, Observer<JSONObject?> { jsonObject ->
+                    Log.e("test11", jsonObject.toString())
                     parseNormalOffersResponse(jsonObject)
                     binding.lnProgressbar.progressBar.visibility = View.GONE
-                    Log.e("test11", jsonObject.toString())
                 })
             } else {
                 binding.lnProgressbar.progressBar.visibility = View.GONE
