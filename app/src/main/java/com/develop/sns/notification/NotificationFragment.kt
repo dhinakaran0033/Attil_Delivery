@@ -287,7 +287,8 @@ class NotificationFragment: Fragment() , NotificationListener {
                             //Log.e("jsonObject", jsonObject.toString() + "")
                             if (jsonObject != null) {
                                 binding.lnProgressbar.progressBar.visibility= View.GONE
-                               // parseSignInResponse(jsonObject)
+                                notificationList.remove(itemDto)
+                                notificationListAdapter.notifyDataSetChanged()
                             }
                         })
                 } else {

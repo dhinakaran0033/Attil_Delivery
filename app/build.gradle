@@ -28,10 +28,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "BASE_API_URL", "\"http://156.67.217.185:3000/\""
+            buildConfigField "String", "BASE_API_URL", "\"https://dev-backend.attilshop.in/\""
         }
         debug {
-            buildConfigField "String", "BASE_API_URL", "\"http://156.67.217.185:3000/\""
+            buildConfigField "String", "BASE_API_URL", "\"https://dev-backend.attilshop.in/\""
         }
     }
     compileOptions {

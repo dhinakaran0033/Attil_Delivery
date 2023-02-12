@@ -31,10 +31,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:id="@+id/tv_order_id"
+                android:padding="5dp"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:text="Order ID : 3455377dfggheye"
+                android:text="Order ID :"
                 android:layout_height="wrap_content"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -63,7 +64,7 @@
                     android:text="@string/pick_up"
                     android:id="@+id/tv_pickup_title"
                     android:layout_marginStart="5dp"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_light"
                     android:fontFamily="@font/noto_sans_light"
                     app:layout_constraintStart_toEndOf="@+id/im_stage1"
                     app:layout_constraintTop_toTopOf="parent"
@@ -71,7 +72,7 @@
 
                 <TextView
                     android:layout_width="wrap_content"
-                    android:text="@string/test1"
+                    android:text="@string/attil_pvt"
                     android:id="@+id/tv_pickup"
                     android:textColor="@color/white"
                     android:fontFamily="@font/noto_sans_regular"
@@ -130,7 +131,7 @@
                     android:id="@+id/tv_drop_off"
                     android:fontFamily="@font/noto_sans_light"
                     android:layout_marginStart="5dp"
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_light"
                     android:textAlignment="center"
                     app:layout_constraintStart_toEndOf="@+id/im_stage3"
                     app:layout_constraintTop_toTopOf="parent"
@@ -150,9 +151,9 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
+                android:layout_height="1dp"
                 app:layout_constraintStart_toStartOf="parent"
-                android:background="@color/accent"
+                android:background="@color/text_light"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/con_3"/>
 
@@ -169,18 +170,17 @@
 
                 <ImageView
                     android:layout_width="0dp"
-                    android:layout_weight="0.3"
+                    android:layout_weight="0.2"
                     android:layout_gravity="center"
                     android:id="@+id/im_stage4"
-                    android:layout_marginStart="5dp"
                     android:src="@drawable/circle_normal_tick"
-                    android:layout_height="20dp"/>
+                    android:layout_height="30dp"/>
 
                 <TextView
                     android:layout_width="0dp"
                     android:gravity="center"
                     android:layout_gravity="center"
-                    android:layout_weight="1.5"
+                    android:layout_weight="1"
                     android:text="@string/waiting_packed"
                     android:id="@+id/waiting_packed"
                     android:textStyle="bold"

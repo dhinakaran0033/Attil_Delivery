@@ -40,7 +40,7 @@ class DeliveryPendingListAdapter (
         fun bind(item: DeliveryPendingDto, position: Int) {
             with(binding) {
 
-                binding.tvOrderId.text = "Order no: "+item.orderId
+                binding.tvOrderId.text = "Order #"+item.orderId
                 binding.tvAddress.text = item.address
 
                 binding.btnPickupOrder.setOnClickListener {
