@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#00CA3B</color>
-    <color name="purple_500">#00CA3B</color>
-    <color name="purple_700">#005858</color>
+    <color name="purple_200">#2fce63</color>
+    <color name="purple_500">#2fce63</color>
+    <color name="purple_700">#185360</color>
     <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="teal_700">#185360</color>
 
-    <color name="primary">#00CA3B</color>
-    <color name="primary_dark">#005858</color>
+    <color name="primary">#2fce63</color>
+    <color name="primary_dark">#185360</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
@@ -18,7 +18,7 @@
     <color name="md_deep_orange_50">#FBE9E7</color>
     <color name="md_deep_purple_600">#5E35B1</color>
     <color name="md_green_50">#E8F5E9</color>
-    <color name="md_green_A700">#00C853</color>
+    <color name="md_green_A700">#2fce63</color>
     <color name="md_grey_100">#F5F5F5</color>
     <color name="md_grey_200">#EEEEEE</color>
     <color name="md_grey_300">#E0E0E0</color>
@@ -31,7 +31,7 @@
     <color name="md_pink_600">#D81B60</color>
     <color name="md_pink_700">#C2185B</color>
     <color name="md_red_500">#F44336</color>
-    <color name="md_red_A700">#D50000</color>
+    <color name="md_red_A700">#ff3a2a</color>
     <color name="md_white_1000">#FFFFFF</color>
 
 
@@ -71,10 +71,11 @@
 
     <color name="error_color">#E7492E</color>
 
-    <color name="button_color">#00CA3B</color>
+    <color name="button_color">#2fce63</color>
     <color name="text_color">#19424D</color>
 
     <color name="item_tile_bg">#F4F7FB</color>
+    <color name="text_light">#95afb5</color>
 
 
 </resources>
