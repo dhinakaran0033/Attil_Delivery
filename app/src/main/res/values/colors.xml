@@ -33,7 +33,7 @@
     <color name="md_red_500">#F44336</color>
     <color name="md_red_A700">#ff3a2a</color>
     <color name="md_white_1000">#FFFFFF</color>
-
+    <color name="black_light">#454545</color>
 
     <!-- Red -->
     <color name="red_700">#D32F2F</color>

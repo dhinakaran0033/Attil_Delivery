@@ -67,30 +67,12 @@ class LoginActivity : SubModuleActivity() {
         binding.btnSignIn.setOnClickListener {
             logInService()
         }
-
-        binding.cbShowPassword.setOnCheckedChangeListener { buttonView, isChecked ->
-            val start: Int
-            val end: Int
-            if (!isChecked) {
-                start = binding.etPassword.selectionStart
-                end = binding.etPassword.selectionEnd
-                binding.etPassword.transformationMethod = PasswordTransformationMethod()
-                binding.etPassword.setSelection(start, end)
-            } else {
-                start = binding.etPassword.selectionStart
-                end = binding.etPassword.selectionEnd
-                binding.etPassword.transformationMethod = null
-                binding.etPassword.setSelection(start, end)
-            }
-        }
-
     }
 
     private fun initClassReference() {
         try {
             preferenceHelper = PreferenceHelper(context)
             languageId = preferenceHelper!!.getIntFromSharedPrefs(AppConstant.KEY_LANGUAGE_ID)
-            binding.cbShowPassword.setButtonDrawable(R.drawable.password_show_drawable)
         } catch (e: Exception) {
             e.printStackTrace()
         }
