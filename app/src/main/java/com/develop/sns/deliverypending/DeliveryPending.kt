@@ -7,9 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.develop.sns.R
+import com.develop.sns.ViewOrderDetails.ViewOrderDetailsFragment
 import com.develop.sns.databinding.FragmentDeliveryPendingBinding
 import com.develop.sns.deliverypending.adapter.DeliveryPendingListAdapter
 import com.develop.sns.deliverypending.dto.DeliveryPendingDto
@@ -31,6 +34,7 @@ class DeliveryPending: Fragment() , PendingListener {
     private lateinit var deliveryPendingList: ArrayList<DeliveryPendingDto>
     private lateinit var notificationListAdapter: DeliveryPendingListAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var OrderDetailsFragment: ViewOrderDetailsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,6 +68,19 @@ class DeliveryPending: Fragment() , PendingListener {
             deliveryPendingList = ArrayList()
             getAccepted()
         } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun launchOrderDetailsFragment(orderId: String) {
+        try {
+            OrderDetailsFragment = ViewOrderDetailsFragment()
+            val bundle = Bundle()
+            bundle.putString("orderId", orderId)
+            OrderDetailsFragment.arguments = bundle
+            val fragmentManager: FragmentManager = childFragmentManager
+            fragmentManager?.let {OrderDetailsFragment.show(fragmentManager, "your tag")}
+        } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
     }
@@ -270,8 +287,8 @@ class DeliveryPending: Fragment() , PendingListener {
     override fun selectPendingItem(itemDto: DeliveryPendingDto, status: String) {
         if(status.equals("Accepted")){
             pickUpOrder(itemDto,status)
-        }else{
-
+        }else if(status.equals("View Order")){
+            launchOrderDetailsFragment(itemDto.orderObjectId)
         }
     }
 
