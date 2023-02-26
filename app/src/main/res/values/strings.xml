@@ -29,4 +29,7 @@
     <string name="map_key">AIzaSyBTnIdL7_NoNVPsb9jp6CCbCjgn3PeBAo0</string>
     <string name="delivered">Delivered</string>
     <string name="return_completed">Return Completed</string>
+    <string name="back">Back</string>
+    <string name="order_placed_on">Order Placed On</string>
+    <string name="payment_information">Payment Information</string>
 </resources>

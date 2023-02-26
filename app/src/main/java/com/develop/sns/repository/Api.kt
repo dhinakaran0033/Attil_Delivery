@@ -34,6 +34,12 @@ interface Api {
         @Body requestObject: JsonObject,
     ): Call<ResponseBody>
 
+    @POST("deliveryNotifications/get/devileryOrderDetails")
+    fun devileryOrderDetails(
+        @Header("Authorization") authorization: String,
+        @Body requestObject: JsonObject,
+    ): Call<ResponseBody>
+
     @POST("deliveryNotifications/get/delivered/All")
     fun getDeliveredOrders(
         @Header("Authorization") authorization: String,
