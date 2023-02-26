@@ -12,7 +12,7 @@ import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import com.develop.sns.databinding.ActivitySplashBinding
 
-class SplashActivity : Activity() {
+class SplashActivity : SubModuleActivity() {
     private var notificationType = 0
     private var dataObject: String? = null
     private val binding by lazy { ActivitySplashBinding.inflate(layoutInflater) }
@@ -21,22 +21,6 @@ class SplashActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val window: Window = window
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                window.statusBarColor =
-                    ContextCompat.getColor(this@SplashActivity, R.color.accent)
-                window.navigationBarColor =
-                    ContextCompat.getColor(this@SplashActivity, R.color.black)
-            }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
         Handler(Looper.getMainLooper()).postDelayed({
             checkNewIntent()
         }, 500)

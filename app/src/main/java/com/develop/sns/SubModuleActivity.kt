@@ -1,9 +1,11 @@
 package com.develop.sns
 
 
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
@@ -41,17 +43,20 @@ open class SubModuleActivity : ModuleActivity() {
     private fun setUpScreen() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val window = window
+                val window: Window = window
                 window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                window.statusBarColor = ContextCompat.getColor(
-                    context,
-                    R.color.accent
-                )
-                window.navigationBarColor = ContextCompat.getColor(
-                    context,
-                    R.color.black
-                )
+                window.statusBarColor =
+                    ContextCompat.getColor(this, R.color.white)
+                window.navigationBarColor =
+                    ContextCompat.getColor(this, R.color.black)
+                getWindow().setFlags(
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                );
+            }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             }
         } catch (e: Exception) {
             e.printStackTrace()
