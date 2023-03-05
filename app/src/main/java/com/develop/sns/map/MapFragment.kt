@@ -149,7 +149,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     fun requestPermission() {
         ActivityCompat.requestPermissions(requireContext() as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
     }
-    
+
     private fun checkPermission(): Boolean {
         val result = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
         val result1 = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
