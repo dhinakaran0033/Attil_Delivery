@@ -3,10 +3,7 @@ package com.develop.sns.completedDelivery
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -272,7 +269,7 @@ class CompletedDelivery: Fragment() , NotificationListener {
 
     private fun logInService(itemDto: CompletedDeliveryDto,status: String) {
         try {
-                binding.lnProgressbar.progressBar.visibility= View.VISIBLE
+                showProgressBar()
                 if (AppUtils.isConnectedToInternet(requireActivity())) {
                     val requestObject = JsonObject()
                     requestObject.addProperty("notificationId", itemDto.id)
@@ -285,7 +282,7 @@ class CompletedDelivery: Fragment() , NotificationListener {
                         .observe(this, { jsonObject ->
                             //Log.e("jsonObject", jsonObject.toString() + "")
                             if (jsonObject != null) {
-                                binding.lnProgressbar.progressBar.visibility= View.GONE
+                                dismissProgressBar()
                                // parseSignInResponse(jsonObject)
                             }
                         })
@@ -297,6 +294,27 @@ class CompletedDelivery: Fragment() , NotificationListener {
                         Toast.LENGTH_SHORT
                     )
                 }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+     fun showProgressBar() {
+        try {
+            binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            activity?.window?.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+     fun dismissProgressBar() {
+        try {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            binding.lnProgressbar.progressBar.visibility = View.GONE
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -5,17 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Point
 import android.graphics.Typeface
-import android.location.Geocoder
 import android.os.Build
-import android.location.Address
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.develop.sns.MainActivity
 import com.develop.sns.R
+import com.develop.sns.login.LoginActivity
 import com.google.android.material.snackbar.Snackbar
 import org.json.JSONObject
 import java.io.*
@@ -118,7 +115,7 @@ class CommonClass {
                 preferenceHelper.saveIntValueToSharedPrefs(AppConstant.KEY_FIRST_TIME, firstTime)
                 ApplicationManager.instance.setUpPhoneLanguage()
 
-                val i = Intent(context, MainActivity::class.java)
+                val i = Intent(context, LoginActivity::class.java)
                 // Closing all the Activities
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
