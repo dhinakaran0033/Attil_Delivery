@@ -1,6 +1,7 @@
 package com.develop.sns.map
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
@@ -11,13 +12,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.develop.sns.R
 import com.develop.sns.databinding.FragmentMapsBinding
 import com.develop.sns.deliverypending.dto.DeliveryPendingDto
+import com.develop.sns.login.LoginActivity
 import com.develop.sns.map.model.DirectionResponses
 import com.develop.sns.notification.dto.NotificationDto
 import com.develop.sns.utils.AppConstant
@@ -95,7 +99,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
 
     private fun getAcceptedAll() {
         try {
-            //binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            showProgressBar()
             if (AppUtils.isConnectedToInternet(requireActivity())) {
                 val requestObject = JsonObject()
                 requestObject.addProperty("carrierId", carrierId)
@@ -107,10 +111,10 @@ class MapFragment: Fragment(), OnMapReadyCallback {
                 ).observe(viewLifecycleOwner, Observer<JSONObject?> { jsonObject ->
                    parseNormalOffersResponse(jsonObject)
                     Log.e("Test_result",jsonObject.toString())
-                    binding.lnProgressbar.progressBar.visibility = View.GONE
+                    dismissProgressBar()
                 })
             } else {
-                binding.lnProgressbar.progressBar.visibility = View.GONE
+                dismissProgressBar()
                 CommonClass.showToastMessage(
                     requireActivity(),
                     binding.layCon,
@@ -119,7 +123,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
                 )
             }
         } catch (e: Exception) {
-            binding.lnProgressbar.progressBar.visibility = View.GONE
+            dismissProgressBar()
             e.printStackTrace()
         }
     }
@@ -127,8 +131,31 @@ class MapFragment: Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        mMap.isBuildingsEnabled = true
+        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+
+        if (!checkPermission()) {
+            requestPermission()
+        }else{
+            mMap.isMyLocationEnabled = true
+            mMap.uiSettings.isMyLocationButtonEnabled = true
+            mMap.setOnMapClickListener {
+                Log.e("test","test_innnnnnnnnnnnnnn")
+            }
+        }
         getAcceptedAll()
     }
+
+    fun requestPermission() {
+        ActivityCompat.requestPermissions(requireContext() as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+    }
+    
+    private fun checkPermission(): Boolean {
+        val result = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+        val result1 = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED
+    }
+
 // not come api so we need to draw and send response to server
     fun drawMap(fromLatlog: String,toLatlog: String,mapFragment: MapFragment,orderObjectId: String) {
         val apiServices = RetrofitClient.apiServices(this)
@@ -387,7 +414,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
 
     private fun accept_Order(orderObjectId: String, jsonString: String) {
         try {
-            binding.lnProgressbar.progressBar.visibility= View.VISIBLE
+            showProgressBar()
             if (AppUtils.isConnectedToInternet(requireActivity())) {
                 val requestObject = JsonObject()
                 requestObject.addProperty("orderObjectId", orderObjectId)
@@ -397,12 +424,13 @@ class MapFragment: Fragment(), OnMapReadyCallback {
                     .observe(this, { jsonObject ->
                         //Log.e("jsonObject", jsonObject.toString() + "")
                         if (jsonObject != null) {
-                            binding.lnProgressbar.progressBar.visibility= View.GONE
+                            dismissProgressBar()
                             Log.e("Test","Test_innn")
                             Log.e("Test",jsonObject.toString())
                         }
                     })
             } else {
+                dismissProgressBar()
                 CommonClass.showToastMessage(
                     requireActivity(),
                     binding.layCon,
@@ -415,6 +443,26 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         }
     }
 
+    fun showProgressBar() {
+        try {
+            binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            activity?.window?.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun dismissProgressBar() {
+        try {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            binding.lnProgressbar.progressBar.visibility = View.GONE
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
 
 }

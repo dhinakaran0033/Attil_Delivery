@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
@@ -110,7 +111,7 @@ class LoginActivity : SubModuleActivity() {
         try {
             hideKeyboard()
             if (validate()) {
-                binding.lnProgressbar.progressBar.visibility= View.VISIBLE
+                showProgressBar()
                 if (AppUtils.isConnectedToInternet(context)) {
                     val requestObject = JsonObject()
                     requestObject.addProperty(
@@ -130,7 +131,7 @@ class LoginActivity : SubModuleActivity() {
                         .observe(this, { jsonObject ->
                             //Log.e("jsonObject", jsonObject.toString() + "")
                             if (jsonObject != null) {
-                                binding.lnProgressbar.progressBar.visibility= View.GONE
+                                dismissProgressBar()
                                 Log.e("test11",jsonObject.toString())
                                 parseSignInResponse(jsonObject)
                             }
@@ -248,8 +249,29 @@ class LoginActivity : SubModuleActivity() {
         return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun requestPermission() {
+     fun requestPermission() {
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+    }
+
+    override fun showProgressBar() {
+        try {
+            binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun dismissProgressBar() {
+        try {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            binding.lnProgressbar.progressBar.visibility = View.GONE
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 }

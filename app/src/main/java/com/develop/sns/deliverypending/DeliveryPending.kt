@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -88,7 +89,7 @@ class DeliveryPending: Fragment() , PendingListener {
 
     private fun getAccepted() {
         try {
-            binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            showProgressBar()
             if (AppUtils.isConnectedToInternet(requireActivity())) {
                 val requestObject = JsonObject()
                 requestObject.addProperty("carrierId", carrierId)
@@ -99,13 +100,13 @@ class DeliveryPending: Fragment() , PendingListener {
                     requestObject,
                     accessToken
                 ).observe(viewLifecycleOwner, Observer<JSONObject?> { jsonObject ->
-                    binding.lnProgressbar.progressBar.visibility = View.GONE
+                    dismissProgressBar()
                     parseNormalOffersResponse(jsonObject)
                     Log.e("test11", jsonObject.toString())
 
                 })
             } else {
-                binding.lnProgressbar.progressBar.visibility = View.GONE
+                dismissProgressBar()
                 CommonClass.showToastMessage(
                     requireActivity(),
                     binding.layCon,
@@ -114,7 +115,6 @@ class DeliveryPending: Fragment() , PendingListener {
                 )
             }
         } catch (e: Exception) {
-            binding.lnProgressbar.progressBar.visibility = View.GONE
             e.printStackTrace()
         }
     }
@@ -294,7 +294,7 @@ class DeliveryPending: Fragment() , PendingListener {
 
     private fun pickUpOrder(itemDto: DeliveryPendingDto,status: String) {
         try {
-                binding.lnProgressbar.progressBar.visibility= View.VISIBLE
+                showProgressBar()
                 if (AppUtils.isConnectedToInternet(requireActivity())) {
                     val requestObject = JsonObject()
                     requestObject.addProperty("notificationId", itemDto.id)
@@ -307,11 +307,12 @@ class DeliveryPending: Fragment() , PendingListener {
                         .observe(this, { jsonObject ->
                             //Log.e("jsonObject", jsonObject.toString() + "")
                             if (jsonObject != null) {
-                                binding.lnProgressbar.progressBar.visibility= View.GONE
+                                dismissProgressBar()
                                // parseSignInResponse(jsonObject)
                             }
                         })
                 } else {
+                    dismissProgressBar()
                     CommonClass.showToastMessage(
                         requireActivity(),
                         binding.layCon,
@@ -319,6 +320,27 @@ class DeliveryPending: Fragment() , PendingListener {
                         Toast.LENGTH_SHORT
                     )
                 }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun showProgressBar() {
+        try {
+            binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            activity?.window?.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun dismissProgressBar() {
+        try {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            binding.lnProgressbar.progressBar.visibility = View.GONE
         } catch (e: Exception) {
             e.printStackTrace()
         }
