@@ -301,7 +301,7 @@ class CompletedDelivery: Fragment() , NotificationListener {
 
      fun showProgressBar() {
         try {
-            binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            binding.lnProgressbar.loadingAnim.visibility = View.VISIBLE
             activity?.window?.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
@@ -314,7 +314,7 @@ class CompletedDelivery: Fragment() , NotificationListener {
      fun dismissProgressBar() {
         try {
             activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            binding.lnProgressbar.progressBar.visibility = View.GONE
+            binding.lnProgressbar.loadingAnim.visibility = View.GONE
         } catch (e: Exception) {
             e.printStackTrace()
         }

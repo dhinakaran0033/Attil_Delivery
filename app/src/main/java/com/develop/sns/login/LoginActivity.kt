@@ -243,7 +243,7 @@ class LoginActivity : SubModuleActivity() {
 
     override fun showProgressBar() {
         try {
-            binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            binding.lnProgressbar.loadingAnim.visibility = View.VISIBLE
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
@@ -256,7 +256,7 @@ class LoginActivity : SubModuleActivity() {
     override fun dismissProgressBar() {
         try {
             window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            binding.lnProgressbar.progressBar.visibility = View.GONE
+            binding.lnProgressbar.loadingAnim.visibility = View.GONE
         } catch (e: Exception) {
             e.printStackTrace()
         }
