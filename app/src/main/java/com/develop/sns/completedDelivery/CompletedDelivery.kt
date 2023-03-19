@@ -76,7 +76,7 @@ class CompletedDelivery: Fragment() , NotificationListener {
                 requestObject.addProperty("carrierId", carrierId)
                 requestObject.addProperty("skip", 0)
                 Log.e("Normal request", requestObject.toString())
-                val deliveryPendingViewModel = CompletedDeliveryViewModel()
+                val deliveryPendingViewModel = CompletedDeliveryViewModel(context)
                 deliveryPendingViewModel.getAccepted(
                     requestObject,
                     accessToken
@@ -277,7 +277,7 @@ class CompletedDelivery: Fragment() , NotificationListener {
                     requestObject.addProperty("carrierId", carrierId)
                     requestObject.addProperty("status", status)
                     requestObject.addProperty("type", "type!")
-                    val deliveryPendingViewModel = CompletedDeliveryViewModel()
+                    val deliveryPendingViewModel = CompletedDeliveryViewModel(context)
                     deliveryPendingViewModel.setOrderStatus(requestObject,accessToken)
                         .observe(this, { jsonObject ->
                             //Log.e("jsonObject", jsonObject.toString() + "")

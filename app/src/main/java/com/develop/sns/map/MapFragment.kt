@@ -104,7 +104,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
                 val requestObject = JsonObject()
                 requestObject.addProperty("carrierId", carrierId)
                 requestObject.addProperty("skip", 0)
-                val mapViewModel = MapViewModel()
+                val mapViewModel = MapViewModel(context)
                 mapViewModel.getAcceptedAll(
                     requestObject,
                     accessToken
@@ -419,7 +419,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
                 val requestObject = JsonObject()
                 requestObject.addProperty("orderObjectId", orderObjectId)
                 requestObject.addProperty("mapData", jsonString)
-                val mapViewModel = MapViewModel()
+                val mapViewModel = MapViewModel(context)
                 mapViewModel.sendMapData(requestObject,accessToken)
                     .observe(this, { jsonObject ->
                         //Log.e("jsonObject", jsonObject.toString() + "")

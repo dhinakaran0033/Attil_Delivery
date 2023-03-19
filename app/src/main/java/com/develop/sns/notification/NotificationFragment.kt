@@ -77,7 +77,7 @@ class NotificationFragment: Fragment() , NotificationListener {
                 requestObject.addProperty("carrierId", carrierId)
                 requestObject.addProperty("skip", 0)
                 Log.e("Normal request", requestObject.toString())
-                val offersViewModel = NotificationViewModel()
+                val offersViewModel = NotificationViewModel(context)
                 offersViewModel.getNotification(
                     requestObject,
                     accessToken
@@ -282,7 +282,7 @@ class NotificationFragment: Fragment() , NotificationListener {
                     requestObject.addProperty("carrierId", carrierId)
                     requestObject.addProperty("status", status)
                     requestObject.addProperty("type", "type!")
-                    val notificationViewModel = NotificationViewModel()
+                    val notificationViewModel = NotificationViewModel(context)
                     notificationViewModel.setOrderStatus(requestObject,accessToken)
                         .observe(this, { jsonObject ->
                             //Log.e("jsonObject", jsonObject.toString() + "")

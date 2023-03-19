@@ -95,7 +95,7 @@ class DeliveryPending: Fragment() , PendingListener {
                 requestObject.addProperty("carrierId", carrierId)
                 requestObject.addProperty("skip", 0)
                 Log.e("Normal request", requestObject.toString())
-                val deliveryPendingViewModel = DeliveryPendingViewModel()
+                val deliveryPendingViewModel = DeliveryPendingViewModel(context)
                 deliveryPendingViewModel.getAccepted(
                     requestObject,
                     accessToken
@@ -302,7 +302,7 @@ class DeliveryPending: Fragment() , PendingListener {
                     requestObject.addProperty("carrierId", carrierId)
                     requestObject.addProperty("status", status)
                     requestObject.addProperty("type", "type!")
-                    val deliveryPendingViewModel = DeliveryPendingViewModel()
+                    val deliveryPendingViewModel = DeliveryPendingViewModel(context)
                     deliveryPendingViewModel.setOrderStatus(requestObject,accessToken)
                         .observe(this, { jsonObject ->
                             //Log.e("jsonObject", jsonObject.toString() + "")
