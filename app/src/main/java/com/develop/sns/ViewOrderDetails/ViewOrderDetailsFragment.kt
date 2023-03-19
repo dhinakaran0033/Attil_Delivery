@@ -95,7 +95,7 @@ class ViewOrderDetailsFragment: DialogFragment()  {
                 val requestObject = JsonObject()
                 requestObject.addProperty("orderObjectId", orderId)
                 Log.e("Normal request", requestObject.toString())
-                val viewOrderDetailsViewModel = ViewOrderDetailsViewModel()
+                val viewOrderDetailsViewModel = ViewOrderDetailsViewModel(context)
                 viewOrderDetailsViewModel.getAccepted(
                     requestObject,
                     accessToken

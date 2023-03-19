@@ -1,5 +1,8 @@
 package com.develop.sns.repository
 
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.develop.sns.BuildConfig
 import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
@@ -170,7 +173,10 @@ interface Api {
 
     companion object {
 
-        fun initRetrofit(): Api {
+        fun initRetrofit(context: Context?): Api {
+            val chuckerInterceptor = ChuckerInterceptor.Builder(context!!)
+                .collector(ChuckerCollector(context!!))
+                .build()
             val api: Api
             val logging = HttpLoggingInterceptor()
             //logging.setLevel(HttpLoggingInterceptor.Level.BASIC)
@@ -179,6 +185,7 @@ interface Api {
             val httpClient = OkHttpClient.Builder()
                 .connectTimeout(60000, TimeUnit.SECONDS)
                 .readTimeout(60000, TimeUnit.SECONDS)
+                .addInterceptor(chuckerInterceptor)
             httpClient.addInterceptor(logging)
 
             val retrofit: Retrofit = Retrofit.Builder()

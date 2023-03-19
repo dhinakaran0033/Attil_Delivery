@@ -114,7 +114,7 @@ class LoginActivity : SubModuleActivity() {
                     requestObject.addProperty("udid", getAndroidDeviceId())
                     Log.e("requestObj", requestObject.toString())
                     //showProgressBar()
-                    val loginViewModel = LoginViewModel()
+                    val loginViewModel = LoginViewModel(applicationContext)
                     loginViewModel.makeLogin(requestObject)
                         .observe(this, { jsonObject ->
                             //Log.e("jsonObject", jsonObject.toString() + "")
