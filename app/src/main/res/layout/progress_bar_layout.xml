@@ -7,22 +7,15 @@
     android:layout_gravity="center"
     android:gravity="center"
     android:orientation="vertical">
-
-        <com.agrawalsuneet.dotsloader.loaders.LinearDotsLoader
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
+        <com.example.loadinganimation.LoadingAnimation
+            android:id="@+id/loadingAnim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="5dp"
             android:visibility="gone"
-            app:loader_animDur="500"
-            app:loader_circleRadius="12dp"
-            app:loader_defaultColor="#C0FC65"
-            app:loader_dotsDist="12dp"
-            app:loader_expandOnSelect="true"
-            app:loader_isSingleDir="true"
-            app:loader_noOfDots="2"
-            app:loader_selectedColor="#FFA500"
-            app:loader_selectedRadius="16dp"
-            app:loader_showRunningShadow="false" />
+            app:barType="@drawable/dot_swipe"
+            app:boldText="false"
+            app:enlarge="3"
+            app:textColor="@color/purple_500"
+            app:textSize="15sp" />
 </RelativeLayout>

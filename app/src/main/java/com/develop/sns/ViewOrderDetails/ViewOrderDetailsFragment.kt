@@ -90,7 +90,7 @@ class ViewOrderDetailsFragment: DialogFragment()  {
 
     private fun getOrderDetails() {
         try {
-            binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            binding.lnProgressbar.loadingAnim.visibility = View.VISIBLE
             if (AppUtils.isConnectedToInternet(requireActivity())) {
                 val requestObject = JsonObject()
                 requestObject.addProperty("orderObjectId", orderId)
@@ -100,7 +100,7 @@ class ViewOrderDetailsFragment: DialogFragment()  {
                     requestObject,
                     accessToken
                 ).observe(viewLifecycleOwner, Observer<JSONObject?> { jsonObject ->
-                    binding.lnProgressbar.progressBar.visibility = View.GONE
+                    binding.lnProgressbar.loadingAnim.visibility = View.GONE
 
                     val gson = Gson()
                     val testModel = gson.fromJson(jsonObject.toString(), OrderResponse::class.java)
@@ -110,7 +110,7 @@ class ViewOrderDetailsFragment: DialogFragment()  {
 
                 })
             } else {
-                binding.lnProgressbar.progressBar.visibility = View.GONE
+                binding.lnProgressbar.loadingAnim.visibility = View.GONE
                 CommonClass.showToastMessage(
                     requireActivity(),
                     binding.layCon,
@@ -119,7 +119,7 @@ class ViewOrderDetailsFragment: DialogFragment()  {
                 )
             }
         } catch (e: Exception) {
-            binding.lnProgressbar.progressBar.visibility = View.GONE
+            binding.lnProgressbar.loadingAnim.visibility = View.GONE
             e.printStackTrace()
         }
     }
