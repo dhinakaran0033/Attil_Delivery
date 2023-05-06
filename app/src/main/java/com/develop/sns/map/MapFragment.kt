@@ -1,13 +1,13 @@
 package com.develop.sns.map
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
-import android.os.Looper
+import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,18 +21,15 @@ import androidx.lifecycle.Observer
 import com.develop.sns.R
 import com.develop.sns.databinding.FragmentMapsBinding
 import com.develop.sns.deliverypending.dto.DeliveryPendingDto
-import com.develop.sns.login.LoginActivity
 import com.develop.sns.map.model.DirectionResponses
-import com.develop.sns.notification.dto.NotificationDto
 import com.develop.sns.utils.AppConstant
 import com.develop.sns.utils.AppUtils
 import com.develop.sns.utils.CommonClass
 import com.develop.sns.utils.PreferenceHelper
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
@@ -62,11 +59,20 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     private lateinit var toLatlog: LatLng
     private lateinit var shape: String
     private lateinit var directionList: DirectionResponses
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var lastKnownLocation: Location? = null
+    private var cameraPosition: CameraPosition? = null
+    private val defaultLocation = LatLng(13.0752392, 79.6558242)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         preferenceHelper = PreferenceHelper(requireActivity())
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        if (savedInstanceState != null) {
+            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
+            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
+        }
     }
 
     override fun onCreateView(
@@ -133,17 +139,47 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         mMap = googleMap
         mMap.isBuildingsEnabled = true
         mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
-
         if (!checkPermission()) {
             requestPermission()
         }else{
             mMap.isMyLocationEnabled = true
             mMap.uiSettings.isMyLocationButtonEnabled = true
-            mMap.setOnMapClickListener {
-                Log.e("test","test_innnnnnnnnnnnnnn")
-            }
+            mMap.setOnMyLocationButtonClickListener(object : OnMyLocationButtonClickListener {
+                override fun onMyLocationButtonClick(): Boolean {
+                    getDeviceLocation()
+                    return false
+                }
+            })
+
         }
         getAcceptedAll()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getDeviceLocation() {
+        try {
+                val locationResult = fusedLocationProviderClient.lastLocation
+                locationResult.addOnCompleteListener(requireActivity()) { task ->
+                    if (task.isSuccessful) {
+                        // Set the map's camera position to the current location of the device.
+                        lastKnownLocation = task.result
+                        if (lastKnownLocation != null) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                LatLng(lastKnownLocation!!.latitude,
+                                    lastKnownLocation!!.longitude), DEFAULT_ZOOM.toFloat()))
+                        }
+                    } else {
+                        Log.e("test", "Current location is null. Using defaults.")
+                        Log.e("test", "Exception: %s", task.exception)
+                        mMap.moveCamera(CameraUpdateFactory
+                            .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat()))
+                        mMap.uiSettings.isMyLocationButtonEnabled = false
+                    }
+                }
+
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message, e)
+        }
     }
 
     fun requestPermission() {
@@ -464,5 +500,10 @@ class MapFragment: Fragment(), OnMapReadyCallback {
         }
     }
 
+    companion object {
+        private const val DEFAULT_ZOOM = 15
+        private const val KEY_CAMERA_POSITION = "camera_position"
+        private const val KEY_LOCATION = "location"
+    }
 
 }
