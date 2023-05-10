@@ -1,4 +1,4 @@
-package com.develop.sns.deliverypending
+package com.develop.sns.ViewOrderDetails
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -8,13 +8,13 @@ import com.develop.sns.repository.ApiRepository
 import com.google.gson.JsonObject
 import org.json.JSONObject
 
-class DeliveryPendingViewModel(context: Context?)  : ViewModel() {
+class ViewOrderDetailsViewModel(context: Context?) : ViewModel() {
 
     private val apiRepository: ApiRepository = ApiRepository()
     private val api = Api.initRetrofit(context)
 
     fun getAccepted(requestObject: JsonObject, token: String): LiveData<JSONObject> {
-        val call = api.getAccepted("Bearer $token", requestObject)
+        val call = api.devileryOrderDetails("Bearer $token", requestObject)
         return apiRepository.callApi(call)
     }
 
@@ -22,6 +22,4 @@ class DeliveryPendingViewModel(context: Context?)  : ViewModel() {
         val call = api.setNotificationStatus("Bearer $token", requestObject)
         return apiRepository.callApi(call)
     }
-
-
 }

@@ -1,26 +1,20 @@
 package com.develop.sns.login
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
-import android.os.Build
-import android.os.Build.VERSION_CODES
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
-import android.text.method.PasswordTransformationMethod
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.Observer
-import com.develop.sns.BuildConfig
-import com.develop.sns.MainActivityViewModel
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.develop.sns.Location.LocationService
 import com.develop.sns.R
 import com.develop.sns.SubModuleActivity
 import com.develop.sns.databinding.ActivityLoginBinding
@@ -55,33 +49,19 @@ class LoginActivity : SubModuleActivity() {
         initClassReference()
         gcmId = getFireBaseToken()
 
+        if (!checkPermission()) {
+            requestPermission()
+        }
+
         binding.btnSignIn.setOnClickListener {
             logInService()
         }
-
-        binding.cbShowPassword.setOnCheckedChangeListener { buttonView, isChecked ->
-            val start: Int
-            val end: Int
-            if (!isChecked) {
-                start = binding.etPassword.selectionStart
-                end = binding.etPassword.selectionEnd
-                binding.etPassword.transformationMethod = PasswordTransformationMethod()
-                binding.etPassword.setSelection(start, end)
-            } else {
-                start = binding.etPassword.selectionStart
-                end = binding.etPassword.selectionEnd
-                binding.etPassword.transformationMethod = null
-                binding.etPassword.setSelection(start, end)
-            }
-        }
-
     }
 
     private fun initClassReference() {
         try {
             preferenceHelper = PreferenceHelper(context)
             languageId = preferenceHelper!!.getIntFromSharedPrefs(AppConstant.KEY_LANGUAGE_ID)
-            binding.cbShowPassword.setButtonDrawable(R.drawable.password_show_drawable)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -119,7 +99,7 @@ class LoginActivity : SubModuleActivity() {
         try {
             hideKeyboard()
             if (validate()) {
-                binding.lnProgressbar.progressBar.visibility= View.VISIBLE
+                showProgressBar()
                 if (AppUtils.isConnectedToInternet(context)) {
                     val requestObject = JsonObject()
                     requestObject.addProperty(
@@ -134,12 +114,12 @@ class LoginActivity : SubModuleActivity() {
                     requestObject.addProperty("udid", getAndroidDeviceId())
                     Log.e("requestObj", requestObject.toString())
                     //showProgressBar()
-                    val loginViewModel = LoginViewModel()
+                    val loginViewModel = LoginViewModel(applicationContext)
                     loginViewModel.makeLogin(requestObject)
                         .observe(this, { jsonObject ->
                             //Log.e("jsonObject", jsonObject.toString() + "")
                             if (jsonObject != null) {
-                                binding.lnProgressbar.progressBar.visibility= View.GONE
+                                dismissProgressBar()
                                 Log.e("test11",jsonObject.toString())
                                 parseSignInResponse(jsonObject)
                             }
@@ -239,10 +219,44 @@ class LoginActivity : SubModuleActivity() {
 
     private fun launchHomeActivity() {
         try {
+            // start location service
+            ContextCompat.startForegroundService(this, Intent(this, LocationService::class.java))
+
             val intent = Intent(this@LoginActivity, HomeActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
             finish()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun checkPermission(): Boolean {
+        val result = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION)
+        val result1 = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED
+    }
+
+     fun requestPermission() {
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+    }
+
+    override fun showProgressBar() {
+        try {
+            binding.lnProgressbar.loadingAnim.visibility = View.VISIBLE
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun dismissProgressBar() {
+        try {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            binding.lnProgressbar.loadingAnim.visibility = View.GONE
         } catch (e: Exception) {
             e.printStackTrace()
         }

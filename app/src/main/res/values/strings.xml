@@ -1,11 +1,13 @@
 <resources>
+
+    <string name="attil_pvt">Attil Private Limited</string>
     <string name="app_name">Attil Delivery</string>
     <string name="enter_your_mobile_number">Enter Your Mobile Number</string>
     <string name="no_internet">Please Check Your Internet Connection</string>
     <string name="required">Required</string>
     <string name="retry">Retry</string>
     <string name="new_user">New User?</string>
-    <string name="enter_your_password">Enter your password</string>
+    <string name="enter_your_password">Password</string>
     <string name="login">Login</string>
     <string name="login_id">Login ID</string>
     <string name="password">Password</string>
@@ -21,6 +23,23 @@
     <string name="view_order">View Order</string>
     <string name="cancel">Cancel</string>
     <string name="delivery_box">Delivery Box</string>
+    <string name="delivery_pending">Delivery Pending</string>
+    <string name="completed_delivery">Complete Delivery</string>
     <string name="base_url">https://maps.googleapis.com</string>
-    <string name="map_key"></string>
+    <string name="map_key">AIzaSyBTnIdL7_NoNVPsb9jp6CCbCjgn3PeBAo0</string>
+    <string name="delivered">Delivered</string>
+    <string name="return_completed">Return Completed</string>
+    <string name="back">Back</string>
+    <string name="order_placed_on">Order Placed On</string>
+    <string name="payment_information">Payment Information</string>
+    <string name="type">Type</string>
+    <string name="amount">Amount</string>
+    <string name="status">Status</string>
+    <string name="customer_contact_information">Customer Contact Information</string>
+    <string name="contact_person">Contact Person</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="addi_mobile_number">Additional Mobile Number</string>
+    <string name="call">Call</string>
+    <string name="delivery_address">Delivery Address Information</string>
+    <string name="current_location">Activated Current Location</string>
 </resources>

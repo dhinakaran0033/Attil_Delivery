@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.develop.sns.R
 import com.develop.sns.completedDelivery.dto.CompletedDeliveryDto
 import com.develop.sns.databinding.CompletedDeliveryListAdapterBinding
 import com.develop.sns.completedDelivery.listener.NotificationListener
@@ -36,8 +37,16 @@ class CompletedDeliveryListAdapter (
         fun bind(item: CompletedDeliveryDto, position: Int) {
             with(binding) {
 
-                binding.tvOrderId.text = "Order no: "+item.orderId
+                binding.tvOrderId.text = "Order #"+item.orderId
                 binding.tvAddress.text = item.address
+
+                if(item.type.equals("delivery")){
+                    binding.activatedLocation.text = context.getString(R.string.delivered)
+                }else{
+                    binding.activatedLocation.text = context.getString(R.string.return_completed)
+
+                }
+
             }
         }
     }

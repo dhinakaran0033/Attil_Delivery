@@ -47,38 +47,40 @@
                     android:fontFamily="@font/noto_sans_bold"
                     android:text="@string/delivery_title"
                     android:textAlignment="center"
+                    android:textStyle="bold"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="-20dp"
                     android:textColor="@color/text_color"
-                    android:textSize="20sp" />
+                    android:textSize="17sp" />
 
                 <ImageView
                     android:id="@+id/iv_logo"
-                    android:layout_width="240dp"
-                    android:layout_height="132dp"
-                    android:layout_alignParentTop="true"
+                    android:layout_width="230dp"
+                    android:layout_height="230dp"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="20dp"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/logo" />
+                    android:background="@drawable/logo"
+                    android:padding="40dp"
+                    android:paddingTop="-20dp" />
 
                 <LinearLayout
                     android:id="@+id/ln_mobile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="-30dp"
+                    android:layout_marginEnd="15dp"
                     android:background="@drawable/boundary_gray">
 
                     <EditText
                         android:id="@+id/et_login_id"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
                         android:layout_weight=".2"
                         android:background="@null"
-                        android:gravity="start"
+                        android:gravity="start|center"
                         android:hint="@string/login_id"
-                        android:textColor="@color/black"
+                        android:textColor="@color/black_light"
+                        android:textColorHint="@color/black_light"
                         android:imeOptions="actionDone"
                         android:inputType="textMultiLine"
                         android:maxLength="50"
@@ -91,9 +93,9 @@
                     android:id="@+id/ln_after_mobile_no"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="15dp"
                     android:orientation="vertical"
                     android:visibility="visible">
 
@@ -103,40 +105,22 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <RelativeLayout
-                            android:id="@+id/rl_password_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:visibility="visible">
-
-
-                            <EditText
-                                android:id="@+id/et_password"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/boundary_gray"
-                                android:hint="@string/enter_your_password"
-                                android:imeOptions="actionDone"
-                                android:inputType="textPassword"
-                                android:maxLength="24"
-                                android:padding="10dp"
-                                android:singleLine="true"
-                                android:textColor="@color/black"
-                                android:textColorHint="#A5A5A5"
-                                android:textCursorDrawable="@null"
-                                android:visibility="visible" />
-
-                            <androidx.appcompat.widget.AppCompatCheckBox
-                                android:id="@+id/cb_show_password"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="5dp"
-                                android:checked="false"
-                                android:text="@null"
-                                tools:ignore="RelativeOverlap" />
-                        </RelativeLayout>
+                        <EditText
+                            android:id="@+id/et_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:background="@drawable/boundary_gray"
+                            android:gravity="start|center"
+                            android:hint="@string/enter_your_password"
+                            android:imeOptions="actionDone"
+                            android:inputType="textPassword"
+                            android:maxLength="24"
+                            android:padding="10dp"
+                            android:singleLine="true"
+                            android:textColor="@color/black_light"
+                            android:textColorHint="@color/black_light"
+                            android:textCursorDrawable="@null"
+                            android:visibility="visible" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -148,7 +132,7 @@
                 android:layout_marginLeft="24dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginRight="24dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="50dp"
                 android:paddingBottom="5dp"
                 android:text="@string/login" />
 

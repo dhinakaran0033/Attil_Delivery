@@ -1,34 +1,35 @@
 package com.develop.sns.map
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
-import android.os.Build
 import android.os.Bundle
-import android.os.Looper
+import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.develop.sns.R
-import com.develop.sns.databinding.FragmentMapBinding
+import com.develop.sns.databinding.FragmentMapsBinding
 import com.develop.sns.deliverypending.dto.DeliveryPendingDto
 import com.develop.sns.map.model.DirectionResponses
-import com.develop.sns.notification.dto.NotificationDto
 import com.develop.sns.utils.AppConstant
 import com.develop.sns.utils.AppUtils
 import com.develop.sns.utils.CommonClass
 import com.develop.sns.utils.PreferenceHelper
-import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
@@ -45,36 +46,33 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
-class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
-    GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener  {
+class MapFragment: Fragment(), OnMapReadyCallback {
 
-    private val binding by lazy { FragmentMapBinding.inflate(layoutInflater) }
+    private var _binding: FragmentMapsBinding? = null
+    private val binding get() = _binding!!
     private var preferenceHelper: PreferenceHelper? = null
     lateinit var accessToken: String
     lateinit var carrierId: String
-    private lateinit var notificationList: ArrayList<NotificationDto>
-
-    //private var mMap: GoogleMap? = null
-    internal lateinit var mLastLocation: Location
-    internal lateinit var mLocationResult: LocationRequest
-    internal lateinit var mLocationCallback: LocationCallback
-    internal var mCurrLocationMarker: Marker? = null
-    internal var mGoogleApiClient: GoogleApiClient? = null
-    internal lateinit var mLocationRequest: LocationRequest
-    internal var mFusedLocationClient: FusedLocationProviderClient? = null
     private lateinit var deliveryPendingList: ArrayList<DeliveryPendingDto>
-
     private lateinit var mMap: GoogleMap
     private lateinit var fromLatlog: LatLng
     private lateinit var toLatlog: LatLng
     private lateinit var shape: String
-    private lateinit var mapFragment: SupportMapFragment
     private lateinit var directionList: DirectionResponses
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var lastKnownLocation: Location? = null
+    private var cameraPosition: CameraPosition? = null
+    private val defaultLocation = LatLng(13.0752392, 79.6558242)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         preferenceHelper = PreferenceHelper(requireActivity())
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        if (savedInstanceState != null) {
+            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
+            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
+        }
     }
 
     override fun onCreateView(
@@ -82,17 +80,16 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
+        _binding = FragmentMapsBinding.inflate(inflater, container, false)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as SupportMapFragment
+        mapFragment.getMapAsync(this)
         return binding.root
-
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initClassReference()
-
-        mapFragment = childFragmentManager.findFragmentById(R.id.map_view) as SupportMapFragment
-
     }
 
     private fun initClassReference() {
@@ -101,7 +98,6 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
             accessToken = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_TOKEN)!!
             carrierId = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_CARRIER_ID)!!
             deliveryPendingList = ArrayList()
-            getAcceptedAll()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -109,22 +105,22 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
     private fun getAcceptedAll() {
         try {
-            //binding.lnProgressbar.progressBar.visibility = View.VISIBLE
+            showProgressBar()
             if (AppUtils.isConnectedToInternet(requireActivity())) {
                 val requestObject = JsonObject()
                 requestObject.addProperty("carrierId", carrierId)
                 requestObject.addProperty("skip", 0)
-                val mapViewModel = MapViewModel()
+                val mapViewModel = MapViewModel(context)
                 mapViewModel.getAcceptedAll(
                     requestObject,
                     accessToken
                 ).observe(viewLifecycleOwner, Observer<JSONObject?> { jsonObject ->
                    parseNormalOffersResponse(jsonObject)
                     Log.e("Test_result",jsonObject.toString())
-                    binding.lnProgressbar.progressBar.visibility = View.GONE
+                    dismissProgressBar()
                 })
             } else {
-                binding.lnProgressbar.progressBar.visibility = View.GONE
+                dismissProgressBar()
                 CommonClass.showToastMessage(
                     requireActivity(),
                     binding.layCon,
@@ -133,7 +129,7 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
                 )
             }
         } catch (e: Exception) {
-            binding.lnProgressbar.progressBar.visibility = View.GONE
+            dismissProgressBar()
             e.printStackTrace()
         }
     }
@@ -141,64 +137,70 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val markerFkip = MarkerOptions()
-            .position(fromLatlog)
-            .title("Shop")
-        val markerMonas = MarkerOptions()
-            .position(toLatlog)
-            .title("Delivery Location")
+        mMap.isBuildingsEnabled = true
+        mMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+        if (!checkPermission()) {
+            requestPermission()
+        }else{
+            mMap.isMyLocationEnabled = true
+            mMap.uiSettings.isMyLocationButtonEnabled = true
+            mMap.setOnMyLocationButtonClickListener(object : OnMyLocationButtonClickListener {
+                override fun onMyLocationButtonClick(): Boolean {
+                    getDeviceLocation()
+                    return false
+                }
+            })
 
-        mMap.addMarker(markerFkip)
-        mMap.addMarker(markerMonas)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(toLatlog, 11.6f))
-
-        shape = directionList.routes?.get(0)?.overviewPolyline?.points.toString()
-
-        val steps = directionList.routes?.get(0)?.legs?.get(0)?.steps
-        if (steps != null) {
-            for (x in steps) {
-
-                val lat: Double = x?.startLocation?.lat!!
-                val lon: Double = x?.startLocation?.lng!!
-                val markPoints = LatLng(lat,lon)
-
-                val markerFkip = MarkerOptions()
-                    .position(markPoints)
-                    .title(x?.htmlInstructions)
-                mMap.addMarker(markerFkip)
-            }
         }
-
-        drawPolyline()
-
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (context?.let {
-                    ContextCompat.checkSelfPermission(
-                        it,
-                        Manifest.permission.ACCESS_FINE_LOCATION)
-                } == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient()
-                mMap!!.isMyLocationEnabled = true
-            }
-        } else {
-            buildGoogleApiClient()
-            mMap!!.isMyLocationEnabled = true
-        }
-
+        getAcceptedAll()
     }
+
+    @SuppressLint("MissingPermission")
+    private fun getDeviceLocation() {
+        try {
+                val locationResult = fusedLocationProviderClient.lastLocation
+                locationResult.addOnCompleteListener(requireActivity()) { task ->
+                    if (task.isSuccessful) {
+                        // Set the map's camera position to the current location of the device.
+                        lastKnownLocation = task.result
+                        if (lastKnownLocation != null) {
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                LatLng(lastKnownLocation!!.latitude,
+                                    lastKnownLocation!!.longitude), DEFAULT_ZOOM.toFloat()))
+                        }
+                    } else {
+                        Log.e("test", "Current location is null. Using defaults.")
+                        Log.e("test", "Exception: %s", task.exception)
+                        mMap.moveCamera(CameraUpdateFactory
+                            .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat()))
+                        mMap.uiSettings.isMyLocationButtonEnabled = false
+                    }
+                }
+
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message, e)
+        }
+    }
+
+    fun requestPermission() {
+        ActivityCompat.requestPermissions(requireContext() as Activity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+    }
+
+    private fun checkPermission(): Boolean {
+        val result = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+        val result1 = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+        return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED
+    }
+
 // not come api so we need to draw and send response to server
-    fun drawMap(
-    fromLatlog: String,
-    toLatlog: String,
-    mapFragment: MapFragment,
-    orderObjectId: String) {
+    fun drawMap(fromLatlog: String,toLatlog: String,mapFragment: MapFragment,orderObjectId: String) {
         val apiServices = RetrofitClient.apiServices(this)
         apiServices.getDirection(fromLatlog, toLatlog,"driving", getString(R.string.map_key))
             .enqueue(object : Callback<DirectionResponses> {
                 override fun onResponse(call: Call<DirectionResponses>, response: Response<DirectionResponses>) {
                     Log.e("Test_res",response.toString())
                     directionList = response.body()!!
-                    this@MapFragment.mapFragment.getMapAsync(mapFragment)
+                    drawPolyline()
 
                     var gson = Gson()
                     var jsonString = gson.toJson(directionList)
@@ -215,81 +217,42 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
     }
 
-    @Synchronized
-    protected fun buildGoogleApiClient() {
-        mGoogleApiClient = context?.let {
-            GoogleApiClient.Builder(it)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build()
-        }
-        mGoogleApiClient!!.connect()
-    }
-
-    override fun onConnected(bundle: Bundle?) {
-
-        mLocationRequest = LocationRequest()
-        mLocationRequest.interval = 1000
-        mLocationRequest.fastestInterval = 1000
-        mLocationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
-        if (context?.let {
-                ContextCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-            } == PackageManager.PERMISSION_GRANTED) {
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-            mFusedLocationClient?.requestLocationUpdates(mLocationRequest,mLocationCallback, Looper.myLooper())
-        }
-    }
-
-
-    override fun onLocationChanged(location: Location) {
-        mLastLocation = location
-        if (mCurrLocationMarker != null) {
-            mCurrLocationMarker!!.remove()
-        }
-        //Place current location marker
-        val latLng = LatLng(location.latitude, location.longitude)
-        val markerOptions = MarkerOptions()
-        markerOptions.position(latLng)
-        markerOptions.title("Current Position")
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-        mCurrLocationMarker = mMap!!.addMarker(markerOptions)
-
-        //move map camera
-        mMap!!.moveCamera(CameraUpdateFactory.newLatLng(latLng))
-        mMap!!.animateCamera(CameraUpdateFactory.zoomTo(11f))
-
-        //stop location updates
-        if (mGoogleApiClient != null) {
-            mFusedLocationClient?.removeLocationUpdates(mLocationCallback)
-        }
-    }
-
-    override fun onConnectionFailed(connectionResult: ConnectionResult) {
-        Toast.makeText(context,"connection failed", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onConnectionSuspended(p0: Int) {
-        Toast.makeText(context,"connection suspended", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun drawPolyline(response: Response<DirectionResponses>) {
-        val shape = response.body()?.routes?.get(0)?.overviewPolyline?.points
-        val polyline = PolylineOptions()
-            .addAll(PolyUtil.decode(shape))
-            .width(8f)
-            .color(Color.RED)
-        mMap.addPolyline(polyline)
-    }
-
     private fun drawPolyline() {
-        Log.e("Test", shape.toString())
-        val polyline = PolylineOptions()
-            .addAll(PolyUtil.decode(shape))
-            .width(8f)
-            .color(Color.RED)
-        mMap.addPolyline(polyline)
+        val markerFkip = MarkerOptions()
+            .position(fromLatlog)
+            .title("Shop")
+        val markerMonas = MarkerOptions()
+            .position(toLatlog)
+            .title("Delivery Location")
+
+        mMap.addMarker(markerFkip)
+        mMap.addMarker(markerMonas)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(toLatlog, 11.6f))
+
+        if(!directionList.routes.isNullOrEmpty()){
+            shape = directionList.routes?.get(0)?.overviewPolyline?.points.toString()
+
+            val steps = directionList.routes?.get(0)?.legs?.get(0)?.steps
+            if (steps != null) {
+                for (x in steps) {
+
+                    val lat: Double = x?.startLocation?.lat!!
+                    val lon: Double = x?.startLocation?.lng!!
+                    val markPoints = LatLng(lat,lon)
+
+                    val markerFkip = MarkerOptions()
+                        .position(markPoints)
+                        .title(x?.htmlInstructions)
+                    mMap.addMarker(markerFkip)
+                }
+            }
+
+            val polyline = PolylineOptions()
+                .addAll(PolyUtil.decode(shape))
+                .width(8f)
+                .color(Color.RED)
+            mMap.addPolyline(polyline)
+        }
     }
 
 
@@ -455,7 +418,7 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
                                 fromLatlog = LatLng(deliveryPendingDto.shopLat, deliveryPendingDto.shopLng)
                                 toLatlog = LatLng(deliveryPendingDto.deliveryLat, deliveryPendingDto.deliveryLng)
 
-                                mapFragment.getMapAsync(this)
+                                drawPolyline()
 
                             }else{
                                 fromLatlog = LatLng(deliveryPendingDto.shopLat, deliveryPendingDto.shopLng)
@@ -487,22 +450,23 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
 
     private fun accept_Order(orderObjectId: String, jsonString: String) {
         try {
-            binding.lnProgressbar.progressBar.visibility= View.VISIBLE
+            showProgressBar()
             if (AppUtils.isConnectedToInternet(requireActivity())) {
                 val requestObject = JsonObject()
                 requestObject.addProperty("orderObjectId", orderObjectId)
                 requestObject.addProperty("mapData", jsonString)
-                val mapViewModel = MapViewModel()
+                val mapViewModel = MapViewModel(context)
                 mapViewModel.sendMapData(requestObject,accessToken)
                     .observe(this, { jsonObject ->
                         //Log.e("jsonObject", jsonObject.toString() + "")
                         if (jsonObject != null) {
-                            binding.lnProgressbar.progressBar.visibility= View.GONE
+                            dismissProgressBar()
                             Log.e("Test","Test_innn")
                             Log.e("Test",jsonObject.toString())
                         }
                     })
             } else {
+                dismissProgressBar()
                 CommonClass.showToastMessage(
                     requireActivity(),
                     binding.layCon,
@@ -515,6 +479,31 @@ class MapFragment: Fragment(), OnMapReadyCallback, LocationListener,
         }
     }
 
+    fun showProgressBar() {
+        try {
+            binding.lnProgressbar.loadingAnim.visibility = View.VISIBLE
+            activity?.window?.setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
+    fun dismissProgressBar() {
+        try {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            binding.lnProgressbar.loadingAnim.visibility = View.GONE
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    companion object {
+        private const val DEFAULT_ZOOM = 15
+        private const val KEY_CAMERA_POSITION = "camera_position"
+        private const val KEY_LOCATION = "location"
+    }
 
 }

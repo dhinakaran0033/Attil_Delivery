@@ -11,61 +11,53 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import com.develop.sns.databinding.ActivitySplashBinding
+import com.develop.sns.home.HomeActivity
+import com.develop.sns.login.LoginActivity
+import com.develop.sns.utils.AppConstant
+import com.develop.sns.utils.PreferenceHelper
 
-class SplashActivity : Activity() {
-    private var notificationType = 0
-    private var dataObject: String? = null
+class SplashActivity : SubModuleActivity() {
     private val binding by lazy { ActivitySplashBinding.inflate(layoutInflater) }
-
+    private val context: SplashActivity = this@SplashActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val window: Window = window
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                window.statusBarColor =
-                    ContextCompat.getColor(this@SplashActivity, R.color.accent)
-                window.navigationBarColor =
-                    ContextCompat.getColor(this@SplashActivity, R.color.black)
-            }
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
         Handler(Looper.getMainLooper()).postDelayed({
-            checkNewIntent()
+            initClassReference()
         }, 500)
     }
 
-    private fun checkNewIntent() {
+    private fun initClassReference() {
         try {
-            onNewIntent(intent)
+            preferenceHelper = PreferenceHelper(context)
+            val token: String = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_TOKEN)!!
+            if (token.isNotEmpty()) {
+                launchHomeActivity()
+            }else{
+                launchLoginActivity()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
+    private fun launchLoginActivity() {
         try {
-//            val extras: Bundle = intent.getExtras()!!
-            launchNextActivity()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun launchNextActivity() {
-        try {
-            val intent = Intent(this@SplashActivity, MainActivity::class.java)
+            val intent = Intent(context, LoginActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
-            overridePendingTransition(0, 0)
+            finish()
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun launchHomeActivity() {
+        try {
+            val intent = Intent(context, HomeActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            startActivity(intent)
             finish()
         } catch (e: Exception) {
             e.printStackTrace()

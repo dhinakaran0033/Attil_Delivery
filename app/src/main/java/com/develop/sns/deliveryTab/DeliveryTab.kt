@@ -5,26 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import com.develop.sns.R
-import com.develop.sns.completedDelivery.CompletedDelivery
 import com.develop.sns.databinding.FragmentDeliveryTabBinding
-import com.develop.sns.deliverypending.DeliveryPending
-import com.develop.sns.listener.BrandSelectListener
-import com.develop.sns.utils.AppConstant
 import com.develop.sns.utils.PreferenceHelper
+import com.google.android.material.tabs.TabLayout
 
 
-class DeliveryTab : Fragment(), BrandSelectListener {
+class DeliveryTab : Fragment() {
 
-    private val binding by lazy { FragmentDeliveryTabBinding.inflate(layoutInflater) }
+
     private var preferenceHelper: PreferenceHelper? = null
-
-    private var currentFragment = 0
-
-    private val productSubFragment = DeliveryPending()
-    private val completedDelivery = CompletedDelivery()
+    private var _binding: FragmentDeliveryTabBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,77 +28,41 @@ class DeliveryTab : Fragment(), BrandSelectListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        _binding = FragmentDeliveryTabBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        selectItem(AppConstant.PRODUCT_FRAGMENT)
-        handleUiElement()
+        setupTabLayout()
+        setupViewPager()
     }
 
-    private fun handleUiElement() {
-        try {
-            binding.rgType.setOnPositionChangedListener {
-                if (it == 0) {
-                    if (currentFragment != AppConstant.PRODUCT_FRAGMENT) selectItem(AppConstant.PRODUCT_FRAGMENT)
-                } else {
-                    if (currentFragment != AppConstant.PACKED_FRAGMENT) selectItem(AppConstant.PACKED_FRAGMENT)
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+    private fun setupViewPager() {
+        binding.viewPager.apply {
+            adapter = activity?.let { ViewPagerAdapter(childFragmentManager, binding.tabLayout.tabCount) }
+            addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(binding.tabLayout))
         }
     }
 
-    private fun selectItem(fragment: Int) {
-        try {
-            currentFragment = fragment
-            when (fragment) {
-                AppConstant.PRODUCT_FRAGMENT -> {
-                    launchProductSubFragment()
-                }
-                AppConstant.PACKED_FRAGMENT -> {
-                    launchPackedFragment()
-                }
-                else -> {
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+    private fun setupTabLayout() {
+        binding.tabLayout.apply {
+            addTab(this.newTab().setText(context.getString(R.string.delivery_pending)))
+            addTab(this.newTab().setText(context.getString(R.string.completed_delivery)))
 
-    private fun launchProductSubFragment() {
-        try {
-            val fragmentManager: FragmentManager = childFragmentManager
-            val transaction: FragmentTransaction = fragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_fragment, productSubFragment)
-            transaction.commitAllowingStateLoss()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+            addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab?) {
+                    tab?.position?.let {
+                        binding.viewPager.currentItem = it
+                    }
+                }
 
-    private fun launchPackedFragment() {
-        try {
-            val fragmentManager: FragmentManager = childFragmentManager
-            val transaction: FragmentTransaction = fragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_fragment, completedDelivery)
-            transaction.commitAllowingStateLoss()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {
+                }
 
-    override fun onSelection() {
-        try {
-            val fragmentManager: FragmentManager = childFragmentManager
-            val transaction: FragmentTransaction = fragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_fragment, completedDelivery)
-            transaction.commitAllowingStateLoss()
-        } catch (e: Exception) {
-            e.printStackTrace()
+                override fun onTabReselected(tab: TabLayout.Tab?) {
+                }
+            })
         }
     }
 }
