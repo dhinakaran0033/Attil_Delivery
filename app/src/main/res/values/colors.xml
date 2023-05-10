@@ -73,9 +73,14 @@
 
     <color name="button_color">#2fce63</color>
     <color name="text_color">#19424D</color>
+    <color name="text_baground">#f2f9f8</color>
 
     <color name="item_tile_bg">#F4F7FB</color>
     <color name="text_light">#95afb5</color>
+    <color name="text_color_light">#265865</color>
+
+
+
 
 
 </resources>

@@ -1,6 +1,7 @@
 package com.develop.sns.ViewOrderDetails
 
 import android.app.Dialog
+import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,6 +21,9 @@ import com.develop.sns.utils.PreferenceHelper
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.json.JSONObject
+import java.io.IOException
+import java.util.*
+
 
 class ViewOrderDetailsFragment: DialogFragment()  {
 
@@ -83,9 +87,51 @@ class ViewOrderDetailsFragment: DialogFragment()  {
     }
 
     private fun setUpViews() {
-        binding.tvOrderId.text = data.orderId
+        Log.e("test", data.currentLocation.toString())
+        if(data.currentLocation == true){
+            binding.layCurrentLocation.visibility = View.VISIBLE
+        }else{
+            binding.layCurrentLocation.visibility = View.GONE
+        }
+        binding.tvOrderId.text = "Order #"+data.orderId
         binding.tvDate.text = data.orderDateTime
+        binding.tvType.text = data.payment!!.paymentMode
+        binding.tvAmount.text = "$ "+ data.payment!!.amount
+        binding.tvStatus.text = data.payment!!.STATUS
+        binding.tvMobile.text = "+91 "+data.userDetail!!.phoneNumber
 
+        data.deliveryLocation?.let {
+            var address1 = getCompleteAddressString(it.lat!!.toDouble(), it.lng!!)
+            address1?.let { it1 ->
+                binding.tvAddress.text = it1
+            }
+        }
+
+
+    }
+
+
+    private fun getCompleteAddressString(LATITUDE: Double, LONGITUDE: Double): String? {
+        var strAdd = ""
+        val geocoder = Geocoder(requireActivity(), Locale.getDefault())
+        try {
+            val addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1)
+            if (addresses != null) {
+                val returnedAddress = addresses[0]
+                val strReturnedAddress = java.lang.StringBuilder("")
+                for (i in 0..returnedAddress.maxAddressLineIndex) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
+                }
+                strAdd = strReturnedAddress.toString()
+                Log.w("My Current loction address", strReturnedAddress.toString())
+            } else {
+                Log.w("My Current loction address", "No Address returned!")
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            Log.w("My Current loction address", "Canont get Address!")
+        }
+        return strAdd
     }
 
     private fun getOrderDetails() {
