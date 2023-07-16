@@ -11,7 +11,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import com.develop.sns.databinding.ActivitySplashBinding
-import com.develop.sns.home.HomeActivity
+import com.develop.sns.home.HomeActivityNew
 import com.develop.sns.login.LoginActivity
 import com.develop.sns.utils.AppConstant
 import com.develop.sns.utils.PreferenceHelper
@@ -55,7 +55,7 @@ class SplashActivity : SubModuleActivity() {
 
     private fun launchHomeActivity() {
         try {
-            val intent = Intent(context, HomeActivity::class.java)
+            val intent = Intent(context, HomeActivityNew::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
             finish()

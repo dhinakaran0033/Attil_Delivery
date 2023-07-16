@@ -18,7 +18,7 @@ import com.develop.sns.Location.LocationService
 import com.develop.sns.R
 import com.develop.sns.SubModuleActivity
 import com.develop.sns.databinding.ActivityLoginBinding
-import com.develop.sns.home.HomeActivity
+import com.develop.sns.home.HomeActivityNew
 import com.develop.sns.utils.AppConstant
 import com.develop.sns.utils.AppUtils
 import com.develop.sns.utils.CommonClass
@@ -222,7 +222,7 @@ class LoginActivity : SubModuleActivity() {
             // start location service
             ContextCompat.startForegroundService(this, Intent(this, LocationService::class.java))
 
-            val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+            val intent = Intent(this@LoginActivity, HomeActivityNew::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             startActivity(intent)
             finish()
