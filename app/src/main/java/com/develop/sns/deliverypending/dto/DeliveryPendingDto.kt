@@ -8,6 +8,7 @@ class DeliveryPendingDto : Serializable {
     var orderObjectId: String = ""
     var notificationStatus: String = ""
     var orderId: String = ""
+    var orderStatus:String = ""
     var currentLocation: Boolean = false
     var type: String = ""
     var orderDateTime: String = ""

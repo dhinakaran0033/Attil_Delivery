@@ -42,4 +42,6 @@
     <string name="call">Call</string>
     <string name="delivery_address">Delivery Address Information</string>
     <string name="current_location">Activated Current Location</string>
+    <string name="Packing">Packing</string>
+    <string name="Packed">Packing</string>
 </resources>
