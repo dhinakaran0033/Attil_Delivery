@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.develop.sns.R
 import com.develop.sns.databinding.DeliveryPendingListAdapterBinding
 import com.develop.sns.deliverypending.dto.DeliveryPendingDto
 import com.develop.sns.deliverypending.listener.PendingListener
@@ -51,6 +52,22 @@ class DeliveryPendingListAdapter (
                 binding.btnViewOrder.setOnClickListener {
                     val itemDto: DeliveryPendingDto = items!!.get(position)
                     notificationListener.selectPendingItem(itemDto,"View Order")
+                }
+
+                if(item.orderStatus == "Accepted" || item.orderStatus == "Pending"){
+                    binding.waitingPacked.text = context.getString(R.string.waiting_packed)
+                    binding.btnPickupOrder.isClickable = false
+                    binding.btnPickupOrder.text = context.getString(R.string.pick_up)
+                }else if (item.orderStatus == "Packing"){
+                    binding.waitingPacked.text = context.getString(R.string.Packing)
+                    binding.btnPickupOrder.isClickable = false
+                    binding.btnPickupOrder.text = context.getString(R.string.pick_up)
+                }else if (item.orderStatus == "Packed"){
+                    binding.waitingPacked.text = context.getString(R.string.Packed)
+                    binding.btnPickupOrder.isClickable = true
+                    binding.btnPickupOrder.text = context.getString(R.string.pick_up)
+                    binding.btnPickupOrder.setBackgroundColor(context.getColor(R.color.purple_500))
+                    binding.btnPickupOrder.setTextColor(context.getColor(R.color.white))
                 }
 
             }

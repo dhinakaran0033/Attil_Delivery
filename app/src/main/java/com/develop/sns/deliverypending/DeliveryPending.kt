@@ -152,6 +152,10 @@ class DeliveryPending: Fragment() , PendingListener {
                                 Log.e("orderId", deliveryPendingDto.orderId)
                             }
 
+                            if (itemObject.has("orderStatus") && !itemObject.isNull("orderStatus")) {
+                                deliveryPendingDto.orderStatus = itemObject.getString("orderStatus")
+                            }
+
                             if (itemObject.has("currentLocation") && !itemObject.isNull("currentLocation")) {
                                 deliveryPendingDto.currentLocation = itemObject.getBoolean("currentLocation")
                                 Log.e("currentLocation", deliveryPendingDto.currentLocation.toString())
