@@ -50,6 +50,11 @@ class NotificationListAdapter (
                     notificationListener.selectNotificationItem(itemDto,"Accepted")
                 }
 
+                binding.tvDecline.setOnClickListener {
+                    val itemDto: NotificationDto = items!!.get(position)
+                    notificationListener.selectNotificationItem(itemDto,"Decline")
+                }
+
             }
         }
 

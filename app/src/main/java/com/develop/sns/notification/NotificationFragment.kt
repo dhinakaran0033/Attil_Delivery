@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -269,7 +270,22 @@ class NotificationFragment: Fragment() , NotificationListener {
     }
 
     override fun selectNotificationItem(itemDto: NotificationDto,status: String) {
-        accept_Order(itemDto,status)
+
+        if(status == "Accepted"){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Do you Accept this order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                accept_Order(itemDto,status)
+                dialog.dismiss()
+            }
+        }else{
+            val dialog = AppUtils.showDiolog(requireActivity(),"Do you Decline this order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                accept_Order(itemDto,status)
+                dialog.dismiss()
+            }
+        }
+
+
     }
 
     private fun accept_Order(itemDto: NotificationDto,status: String) {
@@ -284,14 +300,13 @@ class NotificationFragment: Fragment() , NotificationListener {
                     requestObject.addProperty("type", "type!")
                     val notificationViewModel = NotificationViewModel(context)
                     notificationViewModel.setOrderStatus(requestObject,accessToken)
-                        .observe(this, { jsonObject ->
-                            //Log.e("jsonObject", jsonObject.toString() + "")
+                        .observe(this) { jsonObject ->
                             if (jsonObject != null) {
                                 dismissProgressBar()
                                 notificationList.remove(itemDto)
                                 notificationListAdapter.notifyDataSetChanged()
                             }
-                        })
+                        }
                 } else {
                     dismissProgressBar()
                     CommonClass.showToastMessage(
