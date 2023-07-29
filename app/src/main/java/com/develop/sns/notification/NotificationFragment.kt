@@ -270,11 +270,22 @@ class NotificationFragment: Fragment() , NotificationListener {
     }
 
     override fun selectNotificationItem(itemDto: NotificationDto,status: String) {
-        val dialog = AppUtils.showDiolog(requireActivity(),"Do you Accept this order?")
-        dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
-            accept_Order(itemDto,status)
-            dialog.dismiss()
+
+        if(status == "Accepted"){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Do you Accept this order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                accept_Order(itemDto,status)
+                dialog.dismiss()
+            }
+        }else{
+            val dialog = AppUtils.showDiolog(requireActivity(),"Do you Decline this order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                accept_Order(itemDto,status)
+                dialog.dismiss()
+            }
         }
+
+
     }
 
     private fun accept_Order(itemDto: NotificationDto,status: String) {
