@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/md_grey_300"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/md_grey_400"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:text="Alert"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:textSize="20sp"
+            android:padding="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/alert_message"
+            android:textSize="15sp"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:background="@color/md_grey_300"
+        android:layout_marginTop="15dp"
+        android:layout_height="0.5dp" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0.5dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_yes"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:text="YES"
+                android:background="@color/md_grey_400"
+                android:textColor="@color/blue"
+                android:layout_marginRight="0.5dp"
+                android:layout_gravity="center_horizontal"/>
+            <LinearLayout
+                android:layout_width="0.5dp"
+                android:background="@color/md_grey_300"
+                android:layout_height="match_parent" />
+            <Button
+                android:id="@+id/btn_no"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:text="NO"
+                android:background="@color/md_grey_400"
+                android:textColor="@color/red_A700"
+                android:layout_marginLeft="0.5dp"
+                android:layout_gravity="center_horizontal"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

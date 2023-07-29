@@ -44,4 +44,6 @@
     <string name="current_location">Activated Current Location</string>
     <string name="Packing">Packing</string>
     <string name="Packed">Packing</string>
+    <string name="no">NO</string>
+    <string name="yes">Yes</string>
 </resources>
