@@ -290,32 +290,32 @@ class DeliveryPending: Fragment() , PendingListener {
     }
 
     override fun selectPendingItem(itemDto: DeliveryPendingDto, status: String) {
-        if(status.equals("Pickedup")){
+        if(status.equals(R.string.Pickedup)){
             val dialog = AppUtils.showDiolog(requireActivity(),"Do you Pick Up this order?")
             dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
                 pickUpOrder(itemDto,status)
                 dialog.dismiss()
             }
 
-        }else if(status.equals("Delivered")){
+        }else if(status.equals(R.string.delivered)){
             val dialog = AppUtils.showDiolog(requireActivity(),"Are you Delivered this order?")
             dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
                 pickUpOrder(itemDto,status)
                 dialog.dismiss()
             }
-        }else if(status.equals("Return Accepted")){
+        }else if(status.equals(R.string.return_accepted)){
             val dialog = AppUtils.showDiolog(requireActivity(),"Are you returned the order?")
             dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
                 pickUpOrder(itemDto,status)
                 dialog.dismiss()
             }
-        }else if(status.equals("Return Completed")){
+        }else if(status.equals(R.string.return_completed)){
             val dialog = AppUtils.showDiolog(requireActivity(),"Are you returned the order?")
             dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
                 pickUpOrder(itemDto,status)
                 dialog.dismiss()
             }
-        }else if(status.equals("View Order")){
+        }else if(status.equals(R.string.view_order)){
             launchOrderDetailsFragment(itemDto.orderObjectId)
         }
     }

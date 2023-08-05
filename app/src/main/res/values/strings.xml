@@ -51,4 +51,7 @@
     <string name="return_requested">Return Requested</string>
     <string name="return_accepted">Return Accepted</string>
     <string name="i_am_returned">I am reached and Returned</string>
+    <string name="Pickedup">Pickedup</string>
+    <string name="Accepted">Accepted</string>
+    <string name="Pending">Pending</string>
 </resources>
