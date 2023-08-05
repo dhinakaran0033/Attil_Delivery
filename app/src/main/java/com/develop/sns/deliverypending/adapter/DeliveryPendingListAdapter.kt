@@ -1,12 +1,13 @@
 package com.develop.sns.deliverypending.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.develop.sns.R
 import com.develop.sns.databinding.DeliveryPendingListAdapterBinding
-import com.develop.sns.deliverypending.dto.DeliveryPendingDto
+import com.develop.sns.deliverypending.dto.DeliveryPending
 import com.develop.sns.deliverypending.listener.PendingListener
 import com.develop.sns.utils.PreferenceHelper
 import org.json.JSONArray
@@ -14,7 +15,7 @@ import org.json.JSONArray
 
 class DeliveryPendingListAdapter (
     val context: Context,
-    val items: ArrayList<DeliveryPendingDto>?,
+    val items: ArrayList<DeliveryPending.DeliveryPendingData>?,
     val notificationListener: PendingListener,
 ) : RecyclerView.Adapter<DeliveryPendingListAdapter.ViewHolder>() {
 
@@ -38,14 +39,15 @@ class DeliveryPendingListAdapter (
 
     inner class ViewHolder(val binding: DeliveryPendingListAdapterBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: DeliveryPendingDto, position: Int) {
+        fun bind(item: DeliveryPending.DeliveryPendingData, position: Int) {
             with(binding) {
 
                 binding.tvOrderId.text = "Order #"+item.orderId
                 binding.tvAddress.text = item.address
 
                 binding.btnPickupOrder.setOnClickListener {
-                    val itemDto: DeliveryPendingDto = items!!.get(position)
+                    Log.e("Test123","Test")
+                    val itemDto: DeliveryPending.DeliveryPendingData = items!!.get(position)
                     if(item.orderStatus == context.getString(R.string.Packed)){
                         notificationListener.selectPendingItem(itemDto,context.getString(R.string.Pickedup))
                     }else if(item.orderStatus == context.getString(R.string.Pickedup)){
@@ -59,7 +61,7 @@ class DeliveryPendingListAdapter (
                 }
 
                 binding.btnViewOrder.setOnClickListener {
-                    val itemDto: DeliveryPendingDto = items!!.get(position)
+                    val itemDto: DeliveryPending.DeliveryPendingData = items!![position]
                     notificationListener.selectPendingItem(itemDto,context.getString(R.string.view_order))
                 }
 
@@ -104,9 +106,4 @@ class DeliveryPendingListAdapter (
         }
 
     }
-
-    private fun userexists(jsonArray: JSONArray, usernameToFind: String): Boolean {
-        return jsonArray.toString().contains("\"$usernameToFind\"")
-    }
-
 }
