@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -289,8 +290,31 @@ class DeliveryPending: Fragment() , PendingListener {
     }
 
     override fun selectPendingItem(itemDto: DeliveryPendingDto, status: String) {
-        if(status.equals("Accepted")){
-            pickUpOrder(itemDto,status)
+        if(status.equals("Pickedup")){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Do you Pick Up this order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                pickUpOrder(itemDto,status)
+                dialog.dismiss()
+            }
+
+        }else if(status.equals("Delivered")){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Are you Delivered this order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                pickUpOrder(itemDto,status)
+                dialog.dismiss()
+            }
+        }else if(status.equals("Return Accepted")){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Are you returned the order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                pickUpOrder(itemDto,status)
+                dialog.dismiss()
+            }
+        }else if(status.equals("Return Completed")){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Are you returned the order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                pickUpOrder(itemDto,status)
+                dialog.dismiss()
+            }
         }else if(status.equals("View Order")){
             launchOrderDetailsFragment(itemDto.orderObjectId)
         }
