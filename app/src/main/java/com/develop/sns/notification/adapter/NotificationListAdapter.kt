@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.develop.sns.databinding.NotificationListAdapterBinding
-import com.develop.sns.notification.dto.NotificationDto
+import com.develop.sns.notification.dto.Notification
 import com.develop.sns.notification.listener.NotificationListener
 import com.develop.sns.utils.PreferenceHelper
 import org.json.JSONArray
@@ -13,7 +13,7 @@ import org.json.JSONArray
 
 class NotificationListAdapter (
     val context: Context,
-    val items: ArrayList<NotificationDto>?,
+    val items: ArrayList<Notification.NotificationData>?,
     val notificationListener: NotificationListener,
 ) : RecyclerView.Adapter<NotificationListAdapter.ViewHolder>() {
 
@@ -37,17 +37,22 @@ class NotificationListAdapter (
 
     inner class ViewHolder(val binding: NotificationListAdapterBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: NotificationDto, position: Int) {
+        fun bind(item: Notification.NotificationData, position: Int) {
             with(binding) {
 
                 binding.tvOrderId.text = "Order #"+item.orderId
                 binding.tvAddress.text = item.address
-                binding.tvAmount.text = " ₹ "+item.amount.toString()
-                binding.tvPaymentMode.text = item.paymentMode
+                binding.tvAmount.text = " ₹ "+item.payment.amount.toString()
+                binding.tvPaymentMode.text = item.payment.paymentMode
 
                 binding.btnAcceptOrder.setOnClickListener {
-                    val itemDto: NotificationDto = items!!.get(position)
+                    val itemDto: Notification.NotificationData = items!!.get(position)
                     notificationListener.selectNotificationItem(itemDto,"Accepted")
+                }
+
+                binding.tvDecline.setOnClickListener {
+                    val itemDto: Notification.NotificationData = items!!.get(position)
+                    notificationListener.selectNotificationItem(itemDto,"Decline")
                 }
 
             }

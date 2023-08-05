@@ -63,7 +63,7 @@
             android:configChanges="keyboard|orientation|locale|fontScale|screenLayout|screenSize|uiMode|navigation|touchscreen|keyboardHidden|layoutDirection|smallestScreenSize"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".home.HomeActivity"
+            android:name=".home.HomeActivityNew"
             android:configChanges="keyboard|orientation|locale|fontScale|screenLayout|screenSize|uiMode|navigation|touchscreen|keyboardHidden|layoutDirection|smallestScreenSize"
             android:windowSoftInputMode="adjustPan" />
     </application>

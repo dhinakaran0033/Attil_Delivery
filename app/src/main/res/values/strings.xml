@@ -42,4 +42,13 @@
     <string name="call">Call</string>
     <string name="delivery_address">Delivery Address Information</string>
     <string name="current_location">Activated Current Location</string>
+    <string name="Packing">Packing</string>
+    <string name="Packed">Packed</string>
+    <string name="no">NO</string>
+    <string name="yes">Yes</string>
+    <string name="i_am_reached">I am reached and Delivered</string>
+    <string name="on_the_way">On The Way</string>
+    <string name="return_requested">Return Requested</string>
+    <string name="return_accepted">Return Accepted</string>
+    <string name="i_am_returned">I am reached and Returned</string>
 </resources>
