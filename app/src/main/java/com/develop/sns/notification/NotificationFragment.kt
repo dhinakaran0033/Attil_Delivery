@@ -53,7 +53,10 @@ class NotificationFragment: Fragment() , NotificationListener {
         super.onViewCreated(view, savedInstanceState)
 
         initClassReference()
-
+        binding.idSwipeToRefresh.setOnRefreshListener {
+            binding.idSwipeToRefresh.isRefreshing = false
+            getNotifications()
+        }
 
     }
 
@@ -90,6 +93,7 @@ class NotificationFragment: Fragment() , NotificationListener {
 
                     if( testModel.code == 200){
                         binding.lvNotification.visibility = View.VISIBLE
+                        notificationList.clear()
                         notificationList.addAll(testModel.data)
                         populateNormalOfferList()
                     }else{

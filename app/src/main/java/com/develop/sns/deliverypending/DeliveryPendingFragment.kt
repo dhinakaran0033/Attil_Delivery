@@ -57,6 +57,10 @@ class DeliveryPendingFragment: Fragment() , PendingListener {
         super.onViewCreated(view, savedInstanceState)
 
         initClassReference()
+        binding.idSwipeToRefresh.setOnRefreshListener {
+            binding.idSwipeToRefresh.isRefreshing = false
+            getAccepted()
+        }
 
 
     }
@@ -107,6 +111,7 @@ class DeliveryPendingFragment: Fragment() , PendingListener {
 
                     if( testModel.code == 200){
                         binding.lvNotification.visibility = View.VISIBLE
+                        deliveryPendingList.clear()
                         deliveryPendingList.addAll(testModel.data)
                         populateNormalOfferList()
                     }else{
@@ -189,6 +194,7 @@ class DeliveryPendingFragment: Fragment() , PendingListener {
                         .observe(this, { jsonObject ->
                             if (jsonObject != null) {
                                 dismissProgressBar()
+                                getAccepted()
                             }
                         })
                 } else {
