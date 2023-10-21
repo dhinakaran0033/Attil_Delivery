@@ -18,16 +18,13 @@ import com.develop.sns.databinding.FragmentDeliveryPendingBinding
 import com.develop.sns.deliverypending.adapter.DeliveryPendingListAdapter
 import com.develop.sns.deliverypending.dto.DeliveryPending
 import com.develop.sns.deliverypending.listener.PendingListener
+import com.develop.sns.utils.*
 
-import com.develop.sns.utils.AppConstant
-import com.develop.sns.utils.AppUtils
-import com.develop.sns.utils.CommonClass
-import com.develop.sns.utils.PreferenceHelper
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.json.JSONObject
 
-class DeliveryPendingFragment: Fragment() , PendingListener {
+class DeliveryPendingFragment: BaseFragment(), PendingListener {
 
     private val binding by lazy { FragmentDeliveryPendingBinding.inflate(layoutInflater) }
     private var preferenceHelper: PreferenceHelper? = null
@@ -117,7 +114,10 @@ class DeliveryPendingFragment: Fragment() , PendingListener {
                     }else{
                         binding.lvNotification.visibility = View.GONE
                         binding.tvNormalOfferNoData.visibility = View.VISIBLE
-                        CommonClass.handleErrorResponse(requireActivity(), jsonObject, binding.layCon)
+                        jsonObject?.let {
+                            CommonClass.handleErrorResponse(requireActivity(),
+                                it, binding.layCon)
+                        }
                     }
                 })
             } else {
