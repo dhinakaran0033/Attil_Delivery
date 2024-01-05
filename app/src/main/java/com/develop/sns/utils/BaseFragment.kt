@@ -16,14 +16,25 @@ import com.develop.sns.LocationLiveData.GpsUtils
 import com.develop.sns.LocationLiveData.LocationViewModel
 import com.develop.sns.map.GPS_REQUEST
 import com.develop.sns.map.LOCATION_REQUEST
+import com.develop.sns.map.MapViewModel
+import com.google.gson.JsonObject
 
 open class BaseFragment: Fragment() {
 
     private lateinit var locationViewModel: LocationViewModel
     private var isGPSEnabled = false
+    var longitude:Double = 0.0
+    var latitude:Double = 0.0
+    private var preferenceHelper: PreferenceHelper? = null
+    lateinit var accessToken1: String
+    lateinit var carrierId1: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        preferenceHelper = PreferenceHelper(requireActivity())
+        preferenceHelper = context?.let { PreferenceHelper(it) }
+        accessToken1 = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_TOKEN)!!
+        carrierId1 = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_CARRIER_ID)!!
 
         locationViewModel = ViewModelProviders.of(requireActivity()).get(LocationViewModel::class.java)
         GpsUtils(requireActivity()).turnGPSOn(object : GpsUtils.OnGpsListener {
@@ -65,16 +76,35 @@ open class BaseFragment: Fragment() {
         }
     }
 
-    private fun startLocationUpdate() {
+     fun startLocationUpdate() {
         locationViewModel.getLocationData().observe(this, Observer {
             //latLong.text =  getString(R.string.latLong, it.longitude, it.latitude)
-            Log.e("Test1 dhina", it.longitude.toString())
-            Log.e("Test1 karan", it.latitude.toString())
-            Toast.makeText(context,it.longitude.toString()+","+it.latitude.toString(), Toast.LENGTH_LONG).show()
+            Log.e("Test2 dhina", it.longitude.toString())
+            Log.e("Test2 karan", it.latitude.toString())
+            longitude =  it.longitude
+            latitude =  it.latitude
+            Update_location()
+
         })
     }
 
-    private fun isPermissionsGranted() =
+    private fun Update_location() {
+        if (AppUtils.isConnectedToInternet(requireActivity())) {
+            val requestObject = JsonObject()
+            requestObject.addProperty("carrierId", carrierId1)
+            requestObject.addProperty("lng", longitude)
+            requestObject.addProperty("lat", latitude)
+            locationViewModel.updateLocation(requestObject,accessToken1)
+                .observe(this, { jsonObject ->
+                    if (jsonObject != null) {
+                        Log.e("Test123","Test_innn")
+                        Log.e("Test123",jsonObject.toString())
+                    }
+                })
+        }
+    }
+
+    public fun isPermissionsGranted() =
         ActivityCompat.checkSelfPermission(
             requireActivity(),
             Manifest.permission.ACCESS_FINE_LOCATION

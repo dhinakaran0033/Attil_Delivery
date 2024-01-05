@@ -4,10 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import androidx.lifecycle.LiveData
+import com.develop.sns.repository.Api
+import com.develop.sns.repository.ApiRepository
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.gson.JsonObject
+import org.json.JSONObject
 
 class LocationLiveData(context: Context) : LiveData<LocationModel>() {
 
@@ -50,10 +54,8 @@ class LocationLiveData(context: Context) : LiveData<LocationModel>() {
     }
 
     private fun setLocationData(location: Location) {
-        value = LocationModel(
-            longitude = location.longitude,
-            latitude = location.latitude
-        )
+        value = LocationModel(longitude = location.longitude, latitude = location.latitude)
+
     }
 
     companion object {

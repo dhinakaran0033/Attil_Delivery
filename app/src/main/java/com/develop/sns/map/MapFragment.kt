@@ -16,7 +16,9 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.develop.sns.LocationLiveData.EnablingGPS
+import com.develop.sns.LocationLiveData.LocationViewModel
 import com.develop.sns.R
 import com.develop.sns.databinding.FragmentMapsBinding
 import com.develop.sns.deliverypending.dto.DeliveryPendingDto
@@ -59,6 +61,7 @@ class MapFragment: BaseFragment(), OnMapReadyCallback {
     private var lastKnownLocation: Location? = null
     private var cameraPosition: CameraPosition? = null
     private val defaultLocation = LatLng(13.0752392, 79.6558242)
+    private lateinit var locationViewModel: LocationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,6 +111,29 @@ class MapFragment: BaseFragment(), OnMapReadyCallback {
             accessToken = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_TOKEN)!!
             carrierId = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_CARRIER_ID)!!
             deliveryPendingList = ArrayList()
+
+            // Map current locatiion set icon
+            isPermissionsGranted()
+            locationViewModel = ViewModelProviders.of(requireActivity()).get(LocationViewModel::class.java)
+            locationViewModel.getLocationData().observe(viewLifecycleOwner, Observer {
+                //latLong.text =  getString(R.string.latLong, it.longitude, it.latitude)
+                Log.e("Test1 dhina", it.longitude.toString())
+                Log.e("Test1 karan", it.latitude.toString())
+                longitude =  it.longitude
+                latitude =  it.latitude
+                Toast.makeText(context,longitude.toString()+","+latitude.toString(), Toast.LENGTH_LONG).show()
+                val markPoints = LatLng(longitude,latitude)
+                val markerFkip = MarkerOptions()
+                    .position(markPoints)
+                    .title("Current")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.bell))
+                mMap.addMarker(markerFkip)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    LatLng(latitude,longitude), DEFAULT_ZOOM.toFloat()))
+                // Map current locatiion set icon
+
+            })
+
         } catch (e: Exception) {
             e.printStackTrace()
         }

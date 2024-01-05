@@ -37,6 +37,12 @@ interface Api {
         @Body requestObject: JsonObject,
     ): Call<ResponseBody>
 
+    @POST("orderLocation/updateOrderLocation")
+    fun updateLocation(
+        @Header("Authorization") authorization: String,
+        @Body requestObject: JsonObject,
+    ): Call<ResponseBody>
+
     @POST("deliveryNotifications/get/devileryOrderDetails")
     fun devileryOrderDetails(
         @Header("Authorization") authorization: String,
