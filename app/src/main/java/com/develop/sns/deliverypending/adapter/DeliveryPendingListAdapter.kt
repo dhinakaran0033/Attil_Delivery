@@ -1,12 +1,13 @@
 package com.develop.sns.deliverypending.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.develop.sns.R
 import com.develop.sns.databinding.DeliveryPendingListAdapterBinding
-import com.develop.sns.deliverypending.dto.DeliveryPendingDto
+import com.develop.sns.deliverypending.dto.DeliveryPending
 import com.develop.sns.deliverypending.listener.PendingListener
 import com.develop.sns.utils.PreferenceHelper
 import org.json.JSONArray
@@ -14,7 +15,7 @@ import org.json.JSONArray
 
 class DeliveryPendingListAdapter (
     val context: Context,
-    val items: ArrayList<DeliveryPendingDto>?,
+    val items: ArrayList<DeliveryPending.DeliveryPendingData>?,
     val notificationListener: PendingListener,
 ) : RecyclerView.Adapter<DeliveryPendingListAdapter.ViewHolder>() {
 
@@ -38,62 +39,63 @@ class DeliveryPendingListAdapter (
 
     inner class ViewHolder(val binding: DeliveryPendingListAdapterBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: DeliveryPendingDto, position: Int) {
+        fun bind(item: DeliveryPending.DeliveryPendingData, position: Int) {
             with(binding) {
 
                 binding.tvOrderId.text = "Order #"+item.orderId
                 binding.tvAddress.text = item.address
 
                 binding.btnPickupOrder.setOnClickListener {
-                    val itemDto: DeliveryPendingDto = items!!.get(position)
-                    if(item.orderStatus == "Packed"){
-                        notificationListener.selectPendingItem(itemDto,"Pickedup")
-                    }else if(item.orderStatus == "Pickedup"){
-                        notificationListener.selectPendingItem(itemDto,"Delivered")
-                    }else if(item.orderStatus == "Return Requested"){
-                        notificationListener.selectPendingItem(itemDto,"Return Accepted")
-                    }else if(item.orderStatus == "Return Accepted"){
-                        notificationListener.selectPendingItem(itemDto,"Return Completed")
+                    Log.e("Test123","Test")
+                    val itemDto: DeliveryPending.DeliveryPendingData = items!!.get(position)
+                    if(item.orderStatus == context.getString(R.string.Packed)){
+                        notificationListener.selectPendingItem(itemDto,context.getString(R.string.Pickedup))
+                    }else if(item.orderStatus == context.getString(R.string.Pickedup)){
+                        notificationListener.selectPendingItem(itemDto,context.getString(R.string.delivered))
+                    }else if(item.orderStatus == context.getString(R.string.return_requested)){
+                        notificationListener.selectPendingItem(itemDto,context.getString(R.string.return_accepted))
+                    }else if(item.orderStatus == context.getString(R.string.return_accepted)){
+                        notificationListener.selectPendingItem(itemDto,context.getString(R.string.return_completed))
                     }
 
                 }
 
                 binding.btnViewOrder.setOnClickListener {
-                    val itemDto: DeliveryPendingDto = items!!.get(position)
-                    notificationListener.selectPendingItem(itemDto,"View Order")
+                    val itemDto: DeliveryPending.DeliveryPendingData = items!![position]
+                    notificationListener.selectPendingItem(itemDto,context.getString(R.string.view_order))
                 }
 
-                if(item.orderStatus == "Accepted" || item.orderStatus == "Pending"){
+                if(item.orderStatus == context.getString(R.string.Accepted) || item.orderStatus == context.getString(R.string.Pending)){
                     binding.waitingPacked.text = context.getString(R.string.waiting_packed)
                     binding.btnPickupOrder.isClickable = false
                     binding.btnPickupOrder.text = context.getString(R.string.pick_up)
                     binding.btnPickupOrder.setBackgroundColor(context.getColor(R.color.white))
                     binding.btnPickupOrder.setTextColor(context.getColor(R.color.black))
-                }else if (item.orderStatus == "Packing"){
+                }else if (item.orderStatus == context.getString(R.string.Packing)){
                     binding.waitingPacked.text = context.getString(R.string.Packing)
                     binding.btnPickupOrder.isClickable = false
                     binding.btnPickupOrder.text = context.getString(R.string.pick_up)
                     binding.btnPickupOrder.setBackgroundColor(context.getColor(R.color.white))
                     binding.btnPickupOrder.setTextColor(context.getColor(R.color.black))
-                }else if (item.orderStatus == "Packed"){
+                }else if (item.orderStatus == context.getString(R.string.Packed)){
                     binding.waitingPacked.text = context.getString(R.string.Packed)
                     binding.btnPickupOrder.isClickable = true
                     binding.btnPickupOrder.text = context.getString(R.string.pick_up)
                     binding.btnPickupOrder.setBackgroundColor(context.getColor(R.color.purple_500))
                     binding.btnPickupOrder.setTextColor(context.getColor(R.color.white))
-                }else if (item.orderStatus == "Pickedup"){
+                }else if (item.orderStatus == context.getString(R.string.Pickedup)){
                     binding.waitingPacked.text = context.getString(R.string.on_the_way)
                     binding.btnPickupOrder.isClickable = true
                     binding.btnPickupOrder.text = context.getString(R.string.i_am_reached)
                     binding.btnPickupOrder.setBackgroundColor(context.getColor(R.color.purple_500))
                     binding.btnPickupOrder.setTextColor(context.getColor(R.color.white))
-                }else if (item.orderStatus == "Return Requested"){
+                }else if (item.orderStatus == context.getString(R.string.return_requested)){
                     binding.waitingPacked.text = context.getString(R.string.return_requested)
                     binding.btnPickupOrder.isClickable = true
                     binding.btnPickupOrder.text = context.getString(R.string.pick_up)
                     binding.btnPickupOrder.setBackgroundColor(context.getColor(R.color.yellow))
                     binding.btnPickupOrder.setTextColor(context.getColor(R.color.dark_green))
-                }else if (item.orderStatus == "Return Accepted"){
+                }else if (item.orderStatus == context.getString(R.string.return_accepted)){
                     binding.waitingPacked.text = context.getString(R.string.return_accepted)
                     binding.btnPickupOrder.isClickable = true
                     binding.btnPickupOrder.text = context.getString(R.string.i_am_returned)
@@ -104,9 +106,4 @@ class DeliveryPendingListAdapter (
         }
 
     }
-
-    private fun userexists(jsonArray: JSONArray, usernameToFind: String): Boolean {
-        return jsonArray.toString().contains("\"$usernameToFind\"")
-    }
-
 }

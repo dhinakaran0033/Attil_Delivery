@@ -18,7 +18,11 @@
         app:layout_constraintTop_toTopOf="parent"
         android:textColor="@color/text_color"
         android:textSize="15sp" />
-
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/idSwipeToRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lv_notification"
         android:layout_width="match_parent"
@@ -31,7 +35,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_title"
         app:layout_constraintBottom_toBottomOf="parent"
         android:scrollingCache="false" />
-
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
             <TextView
                 android:id="@+id/tv_normal_offer_no_data"
                 android:layout_width="wrap_content"

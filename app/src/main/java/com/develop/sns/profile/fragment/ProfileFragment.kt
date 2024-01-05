@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.develop.sns.Location.LocationService
 import com.develop.sns.databinding.FragmentProfileBinding
 import com.develop.sns.utils.PreferenceHelper
 
@@ -36,7 +35,7 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.lnLogout.setOnClickListener{
-            activity?.stopService(Intent(activity, LocationService::class.java))
+            // logout code
         }
         /*initClassReference()
         handleUiElement()*/

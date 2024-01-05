@@ -5,6 +5,11 @@
     android:id="@+id/lay_con"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/idSwipeToRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lv_notification"
         android:layout_width="match_parent"
@@ -17,6 +22,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:scrollingCache="false" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <TextView
         android:id="@+id/tv_normal_offer_no_data"

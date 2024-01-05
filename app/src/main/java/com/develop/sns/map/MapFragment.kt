@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
-import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,16 +15,15 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import com.develop.sns.LocationLiveData.EnablingGPS
+import com.develop.sns.LocationLiveData.LocationViewModel
 import com.develop.sns.R
 import com.develop.sns.databinding.FragmentMapsBinding
 import com.develop.sns.deliverypending.dto.DeliveryPendingDto
 import com.develop.sns.map.model.DirectionResponses
-import com.develop.sns.utils.AppConstant
-import com.develop.sns.utils.AppUtils
-import com.develop.sns.utils.CommonClass
-import com.develop.sns.utils.PreferenceHelper
+import com.develop.sns.utils.*
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -46,7 +44,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 
-class MapFragment: Fragment(), OnMapReadyCallback {
+class MapFragment: BaseFragment(), OnMapReadyCallback {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
@@ -63,7 +61,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     private var lastKnownLocation: Location? = null
     private var cameraPosition: CameraPosition? = null
     private val defaultLocation = LatLng(13.0752392, 79.6558242)
-
+    private lateinit var locationViewModel: LocationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,7 +87,22 @@ class MapFragment: Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initClassReference()
+        context?.let {
+            var isLocationEnable:Boolean = EnablingGPS.CheckLocationEnable(it)
+            if(isLocationEnable){
+                initClassReference()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        context?.let {
+            var isLocationEnable:Boolean = EnablingGPS.CheckLocationEnable(it)
+            if(isLocationEnable){
+                initClassReference()
+            }
+        }
     }
 
     private fun initClassReference() {
@@ -98,6 +111,29 @@ class MapFragment: Fragment(), OnMapReadyCallback {
             accessToken = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_TOKEN)!!
             carrierId = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_CARRIER_ID)!!
             deliveryPendingList = ArrayList()
+
+            // Map current locatiion set icon
+            isPermissionsGranted()
+            locationViewModel = ViewModelProviders.of(requireActivity()).get(LocationViewModel::class.java)
+            locationViewModel.getLocationData().observe(viewLifecycleOwner, Observer {
+                //latLong.text =  getString(R.string.latLong, it.longitude, it.latitude)
+                Log.e("Test1 dhina", it.longitude.toString())
+                Log.e("Test1 karan", it.latitude.toString())
+                longitude =  it.longitude
+                latitude =  it.latitude
+                Toast.makeText(context,longitude.toString()+","+latitude.toString(), Toast.LENGTH_LONG).show()
+                val markPoints = LatLng(longitude,latitude)
+                val markerFkip = MarkerOptions()
+                    .position(markPoints)
+                    .title("Current")
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.bell))
+                mMap.addMarker(markerFkip)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    LatLng(latitude,longitude), DEFAULT_ZOOM.toFloat()))
+                // Map current locatiion set icon
+
+            })
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -115,7 +151,7 @@ class MapFragment: Fragment(), OnMapReadyCallback {
                     requestObject,
                     accessToken
                 ).observe(viewLifecycleOwner, Observer<JSONObject?> { jsonObject ->
-                   parseNormalOffersResponse(jsonObject)
+                   jsonObject?.let { parseNormalOffersResponse(it) }
                     Log.e("Test_result",jsonObject.toString())
                     dismissProgressBar()
                 })
@@ -507,3 +543,6 @@ class MapFragment: Fragment(), OnMapReadyCallback {
     }
 
 }
+
+const val LOCATION_REQUEST = 100
+const val GPS_REQUEST = 101

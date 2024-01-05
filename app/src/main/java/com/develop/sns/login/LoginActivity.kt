@@ -14,7 +14,6 @@ import android.view.animation.Animation
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.develop.sns.Location.LocationService
 import com.develop.sns.R
 import com.develop.sns.SubModuleActivity
 import com.develop.sns.databinding.ActivityLoginBinding
@@ -220,7 +219,7 @@ class LoginActivity : SubModuleActivity() {
     private fun launchHomeActivity() {
         try {
             // start location service
-            ContextCompat.startForegroundService(this, Intent(this, LocationService::class.java))
+            //ContextCompat.startForegroundService(this, Intent(this, LocationService::class.java))
 
             val intent = Intent(this@LoginActivity, HomeActivityNew::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)

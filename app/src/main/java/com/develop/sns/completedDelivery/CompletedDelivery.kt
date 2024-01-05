@@ -51,7 +51,10 @@ class CompletedDelivery: Fragment() , NotificationListener {
         super.onViewCreated(view, savedInstanceState)
 
         initClassReference()
-
+        binding.idSwipeToRefresh.setOnRefreshListener {
+            binding.idSwipeToRefresh.isRefreshing = false
+            getAccepted()
+        }
 
     }
 
@@ -232,7 +235,7 @@ class CompletedDelivery: Fragment() , NotificationListener {
 
 
                             }
-
+                            deliveryPendingList.clear()
                             deliveryPendingList.add(completedDeliveryDto)
                         }
                     }

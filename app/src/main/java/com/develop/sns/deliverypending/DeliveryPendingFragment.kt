@@ -1,4 +1,4 @@
-package com.develop.sns.notification
+package com.develop.sns.deliverypending
 
 import android.os.Bundle
 import android.util.Log
@@ -9,30 +9,31 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.develop.sns.R
-import com.develop.sns.databinding.FragmentNotificationBinding
-import com.develop.sns.notification.adapter.NotificationListAdapter
-import com.develop.sns.notification.dto.Notification
-import com.develop.sns.notification.listener.NotificationListener
-import com.develop.sns.utils.AppConstant
-import com.develop.sns.utils.AppUtils
-import com.develop.sns.utils.CommonClass
-import com.develop.sns.utils.PreferenceHelper
+import com.develop.sns.ViewOrderDetails.ViewOrderDetailsFragment
+import com.develop.sns.databinding.FragmentDeliveryPendingBinding
+import com.develop.sns.deliverypending.adapter.DeliveryPendingListAdapter
+import com.develop.sns.deliverypending.dto.DeliveryPending
+import com.develop.sns.deliverypending.listener.PendingListener
+import com.develop.sns.utils.*
+
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.json.JSONObject
 
-class NotificationFragment: Fragment() , NotificationListener {
+class DeliveryPendingFragment: BaseFragment(), PendingListener {
 
-    private val binding by lazy { FragmentNotificationBinding.inflate(layoutInflater) }
+    private val binding by lazy { FragmentDeliveryPendingBinding.inflate(layoutInflater) }
     private var preferenceHelper: PreferenceHelper? = null
     lateinit var accessToken: String
     lateinit var carrierId: String
-    private lateinit var notificationList: ArrayList<Notification.NotificationData>
-    private lateinit var notificationListAdapter: NotificationListAdapter
+    private lateinit var deliveryPendingList: ArrayList<DeliveryPending.DeliveryPendingData>
+    private lateinit var notificationListAdapter: DeliveryPendingListAdapter
     private lateinit var linearLayoutManager: LinearLayoutManager
+    private lateinit var OrderDetailsFragment: ViewOrderDetailsFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +56,9 @@ class NotificationFragment: Fragment() , NotificationListener {
         initClassReference()
         binding.idSwipeToRefresh.setOnRefreshListener {
             binding.idSwipeToRefresh.isRefreshing = false
-            getNotifications()
+            getAccepted()
         }
+
 
     }
 
@@ -66,15 +68,28 @@ class NotificationFragment: Fragment() , NotificationListener {
             preferenceHelper = context?.let { PreferenceHelper(it) }
             accessToken = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_TOKEN)!!
             carrierId = preferenceHelper!!.getValueFromSharedPrefs(AppConstant.KEY_CARRIER_ID)!!
-            notificationList = ArrayList()
-            getNotifications()
+            deliveryPendingList = ArrayList()
+            getAccepted()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    private fun launchOrderDetailsFragment(orderId: String) {
+        try {
+            OrderDetailsFragment = ViewOrderDetailsFragment()
+            val bundle = Bundle()
+            bundle.putString("orderId", orderId)
+            OrderDetailsFragment.arguments = bundle
+            val fragmentManager: FragmentManager = childFragmentManager
+            fragmentManager?.let {OrderDetailsFragment.show(fragmentManager, "your tag")}
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
 
-    private fun getNotifications() {
+
+    private fun getAccepted() {
         try {
             showProgressBar()
             if (AppUtils.isConnectedToInternet(requireActivity())) {
@@ -82,27 +97,28 @@ class NotificationFragment: Fragment() , NotificationListener {
                 requestObject.addProperty("carrierId", carrierId)
                 requestObject.addProperty("skip", 0)
                 Log.e("Normal request", requestObject.toString())
-                val offersViewModel = NotificationViewModel(context)
-                offersViewModel.getNotification(
+                val deliveryPendingViewModel = DeliveryPendingViewModel(context)
+                deliveryPendingViewModel.getAccepted(
                     requestObject,
                     accessToken
                 ).observe(viewLifecycleOwner, Observer<JSONObject?> { jsonObject ->
-                    Log.e("test33", jsonObject.toString())
+                    dismissProgressBar()
                     var gson = Gson()
-                    var testModel = gson.fromJson(jsonObject.toString(), Notification::class.java)
+                    var testModel = gson.fromJson(jsonObject.toString(), DeliveryPending::class.java)
 
                     if( testModel.code == 200){
                         binding.lvNotification.visibility = View.VISIBLE
-                        notificationList.clear()
-                        notificationList.addAll(testModel.data)
+                        deliveryPendingList.clear()
+                        deliveryPendingList.addAll(testModel.data)
                         populateNormalOfferList()
                     }else{
-                            binding.lvNotification.visibility = View.GONE
-                            binding.tvNormalOfferNoData.visibility = View.VISIBLE
-                            CommonClass.handleErrorResponse(requireActivity(), jsonObject, binding.layCon)
+                        binding.lvNotification.visibility = View.GONE
+                        binding.tvNormalOfferNoData.visibility = View.VISIBLE
+                        jsonObject?.let {
+                            CommonClass.handleErrorResponse(requireActivity(),
+                                it, binding.layCon)
+                        }
                     }
-
-                    dismissProgressBar()
                 })
             } else {
                 dismissProgressBar()
@@ -114,19 +130,17 @@ class NotificationFragment: Fragment() , NotificationListener {
                 )
             }
         } catch (e: Exception) {
-            dismissProgressBar()
             e.printStackTrace()
         }
-
     }
 
     private fun populateNormalOfferList() {
         try {
-            if (!notificationList.isNullOrEmpty()) {
+            if (!deliveryPendingList.isNullOrEmpty()) {
                 linearLayoutManager = LinearLayoutManager(requireActivity())
                 binding.lvNotification.layoutManager = linearLayoutManager
                 notificationListAdapter =
-                    NotificationListAdapter(requireActivity(), notificationList, this@NotificationFragment)
+                    DeliveryPendingListAdapter(requireActivity(), deliveryPendingList, this@DeliveryPendingFragment)
                 binding.lvNotification.adapter = notificationListAdapter
             }
         } catch (e: Exception) {
@@ -134,44 +148,55 @@ class NotificationFragment: Fragment() , NotificationListener {
         }
     }
 
-    override fun selectNotificationItem(itemDto: Notification.NotificationData, status: String) {
+    override fun selectPendingItem(itemDto: DeliveryPending.DeliveryPendingData, status: String) {
+        if(status == resources.getString(R.string.Pickedup)){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Do you Pick Up this order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                pickUpOrder(itemDto,status)
+                dialog.dismiss()
+            }
 
-        if(status == "Accepted"){
-            val dialog = AppUtils.showDiolog(requireActivity(),"Do you Accept this order?")
+        }else if(status == resources.getString(R.string.delivered)){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Are you Delivered this order?")
             dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
-                accept_Order(itemDto,status)
+                pickUpOrder(itemDto,status)
                 dialog.dismiss()
             }
-        }else{
-            val dialog = AppUtils.showDiolog(requireActivity(),"Do you Decline this order?")
+        }else if(status == resources.getString(R.string.return_accepted)){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Are you returned the order?")
             dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
-                accept_Order(itemDto,status)
+                pickUpOrder(itemDto,status)
                 dialog.dismiss()
             }
+        }else if(status == resources.getString(R.string.return_completed)){
+            val dialog = AppUtils.showDiolog(requireActivity(),"Are you returned the order?")
+            dialog.findViewById<Button>(R.id.btn_yes).setOnClickListener {
+                pickUpOrder(itemDto,status)
+                dialog.dismiss()
+            }
+        }else if(status == resources.getString(R.string.view_order)){
+            launchOrderDetailsFragment(itemDto.orderObjectId)
         }
-
-
     }
 
-    private fun accept_Order(itemDto: Notification.NotificationData, status: String) {
+    private fun pickUpOrder(itemDto: DeliveryPending.DeliveryPendingData, status: String) {
         try {
                 showProgressBar()
                 if (AppUtils.isConnectedToInternet(requireActivity())) {
                     val requestObject = JsonObject()
-                    requestObject.addProperty("notificationId", itemDto.orderId)
+                    requestObject.addProperty("notificationId", itemDto._id)
                     requestObject.addProperty("orderObjectId", itemDto.orderObjectId)
                     requestObject.addProperty("carrierId", carrierId)
                     requestObject.addProperty("status", status)
                     requestObject.addProperty("type", "type!")
-                    val notificationViewModel = NotificationViewModel(context)
-                    notificationViewModel.setOrderStatus(requestObject,accessToken)
-                        .observe(this) { jsonObject ->
+                    val deliveryPendingViewModel = DeliveryPendingViewModel(context)
+                    deliveryPendingViewModel.setOrderStatus(requestObject,accessToken)
+                        .observe(this, { jsonObject ->
                             if (jsonObject != null) {
                                 dismissProgressBar()
-                                notificationList.remove(itemDto)
-                                notificationListAdapter.notifyDataSetChanged()
+                                getAccepted()
                             }
-                        }
+                        })
                 } else {
                     dismissProgressBar()
                     CommonClass.showToastMessage(
@@ -182,7 +207,6 @@ class NotificationFragment: Fragment() , NotificationListener {
                     )
                 }
         } catch (e: Exception) {
-            dismissProgressBar()
             e.printStackTrace()
         }
     }
